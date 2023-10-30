@@ -9,7 +9,6 @@ import tensorflow as tf
 
 
 #Set working directory to the dataset folder
-
 os.chdir(os.path.join(os.getcwd(),'Dataset_FracAtlas'))
 #Einlesen der dataset.csv Datei
 general_info_df = pd.read_csv('dataset.csv')
@@ -30,17 +29,20 @@ def data_split(type):
 
 
 #Todo: vektoren durch 255 teilen, scaling anpassen
+#Todo preprocessing in extra file schieben. Neuronales Netz in eigene File, dass es wiederverwendbar ist
+
+
 def preprocessing():
     pass
 
 
-def showimage(type,name,):
+def showimage(name):
     """
     Zeigt Bilder an. Eingabe Fractured / Non_fractured und Bildname.
     """
 
     #Navigiert path in fractured, bzw. Non_fractured Ordner.
-    os.chdir(os.path.join(os.getcwd(),'Dataset_FracAtlas','images',type))
+    os.chdir(os.path.join(os.getcwd(),'Dataset_FracAtlas','images','full_dataset'))
     rows = 5
     columns = 5
 
@@ -51,20 +53,16 @@ def showimage(type,name,):
     #cwd zurück auf Standard-Ordner setzen
     os.chdir(os.path.join(os.getcwd(),'..','..','..'))
 
+#Todo https://stackoverflow.com/questions/37340129/tensorflow-training-on-my-own-image
+#Todo dataset erstellen
 def create_dataset():
     pass
 
-
-
 def main():
-
-
     training_dataset = data_split('train')
-    #print(training_dataset)
+    print(training_dataset)
 
-
-
-    showimage('Fractured','IMG0000019.jpg')
+    showimage('IMG0000000.jpg')
 
 if __name__ == "__main__":
     main()
