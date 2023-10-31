@@ -60,9 +60,10 @@ def create_dataset():
     #Todo rescale stimmt nicht, das sind nicht die RGB-values sondern die x und y achse
     images_generator = tf.keras.preprocessing.image.ImageDataGenerator(rescale = 1./255)
     path = os.path.join(os.getcwd(),'Dataset_FracAtlas','images')
-    images, labels = next(images_generator.flow_from_directory(path))
+    images, labels = next(images_generator.flow_from_directory(path,target_size=(28,28),color_mode='grayscale'))
 
     return images, labels
+
 
 
 
@@ -73,13 +74,28 @@ def main():
 
     images, labels = create_dataset()
 
-    #print(images)
+    print(images.shape)
+
+
+    model = tf.keras.models.Sequential([
+        tf.keras.layers.Flatten(input_shape=(28, 28)),
+        tf.keras.layers.Dense(128, activation='relu'),
+        tf.keras.layers.Dropout(0.2),
+        tf.keras.layers.Dense(10, activation='softmax')
+    ])
+
+    model.compile(optimizer='adam',
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
+    
+    model.fit(images,labels, epochs=5)
 
 
 
-    plt.imshow(images[1,:,:])
-    plt.show()
-    print(labels[7])
+
+    #plt.imshow(images[1,:,:])
+    #plt.show()
+    #print(labels[7])
 
 
 
