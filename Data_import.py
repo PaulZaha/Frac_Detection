@@ -55,6 +55,8 @@ def create_dataset():
     """
     Erstellt einen TensorFlow-Datensatz. Einput ist ein dataframe (training, test oder valid datensatz)
     """
+
+    #Todo rescale stimmt nicht, das sind nicht die RGB-values sondern die x und y achse
     images_generator = tf.keras.preprocessing.image.ImageDataGenerator(rescale = 1./255)
     path = os.path.join(os.getcwd(),'Dataset_FracAtlas','images')
     images, labels = next(images_generator.flow_from_directory(path))
