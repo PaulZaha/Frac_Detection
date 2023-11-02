@@ -60,7 +60,7 @@ def create_generators(df):
                                                         x_col='image_id',
                                                         y_col='fractured',
                                                         class_mode='binary',
-                                                        target_size=(256,256),
+                                                        target_size=(64,64),
                                                         subset='training')
 
     validation_generator = train_datagen.flow_from_dataframe(dataframe=df,
@@ -68,7 +68,7 @@ def create_generators(df):
                                                         x_col='image_id',
                                                         y_col='fractured',
                                                         class_mode='binary',
-                                                        target_size=(256,256),
+                                                        target_size=(64,64),
                                                         subset='validation')
     return train_generator, validation_generator
 
@@ -82,7 +82,7 @@ def main():
 
     pipeline_dataframe = csv_preprocessing(general_info_df)
     train_generator,validation_generator = create_generators(pipeline_dataframe)
-    model_CNN(train_generator,validation_generator)
+    model_sequential(train_generator,validation_generator)
 
 if __name__ == "__main__":
     main()
