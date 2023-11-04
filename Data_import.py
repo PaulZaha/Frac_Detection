@@ -52,10 +52,10 @@ def create_generators(df):
     """
     Creates a training image dataset and a validation image dataset. Args[df: preprocessed dataframe]
     """
-    train_datagen = tf.keras.preprocessing.image.ImageDataGenerator(rescale = 1./255, validation_split=0.2)
+    datagen = tf.keras.preprocessing.image.ImageDataGenerator(rescale = 1./255, validation_split=0.2)
     path = os.path.join(os.getcwd(),'Dataset_FracAtlas','images','all')
 
-    train_generator = train_datagen.flow_from_dataframe(dataframe=df,
+    train_generator = datagen.flow_from_dataframe(dataframe=df,
                                                         directory=path,
                                                         x_col='image_id',
                                                         y_col='fractured',
@@ -63,7 +63,7 @@ def create_generators(df):
                                                         target_size=(64,64),
                                                         subset='training')
 
-    validation_generator = train_datagen.flow_from_dataframe(dataframe=df,
+    validation_generator = datagen.flow_from_dataframe(dataframe=df,
                                                         directory=path,
                                                         x_col='image_id',
                                                         y_col='fractured',
@@ -71,6 +71,7 @@ def create_generators(df):
                                                         target_size=(64,64),
                                                         subset='validation')
     return train_generator, validation_generator
+
 
 
 #Todo preprocessing in extra file schieben. Neuronales Netz in eigene File, dass es wiederverwendbar ist
@@ -82,7 +83,11 @@ def main():
 
     pipeline_dataframe = csv_preprocessing(general_info_df)
     train_generator,validation_generator = create_generators(pipeline_dataframe)
-    model_sequential(train_generator,validation_generator)
+
+    
+    model_CNN(train_generator,validation_generator)
+
+    
 
 if __name__ == "__main__":
     main()
