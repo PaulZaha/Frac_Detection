@@ -44,8 +44,25 @@ def csv_preprocessing(df):
     """
     Creating csv with Columns ['image_id','fractured'] for dataset input pipeline. Args[df: main dataframe]
     """
+
+    df = df[df['leg'] == 1]
+    df = df.sample(frac = 1)
+    print(df)
+
     #inital main dataframe turned into dataset with columns 'image_id' and str('fractured')
     dataset = df[['image_id', 'fractured']].assign(fractured=df['fractured'].astype(str))
+    
+
+    #Datensatz auf ähnliche Anzahl 0 und 1 aufteilen.
+    #dataset = dataset.sample(frac = 1)
+    boolean_index = (dataset['fractured'] == '0')
+    to_delete = dataset[boolean_index].head(1749)
+    dataset = dataset.drop(to_delete.index)
+    dataset = dataset.sample(frac = 1)
+    print(dataset)
+    
+
+    #print(dataset['fractured'].sum())
     return dataset
 
 def create_generators(df):
@@ -60,7 +77,7 @@ def create_generators(df):
                                                         x_col='image_id',
                                                         y_col='fractured',
                                                         class_mode='binary',
-                                                        target_size=(64,64),
+                                                        target_size=(224,224),
                                                         subset='training')
 
     validation_generator = datagen.flow_from_dataframe(dataframe=df,
@@ -68,7 +85,7 @@ def create_generators(df):
                                                         x_col='image_id',
                                                         y_col='fractured',
                                                         class_mode='binary',
-                                                        target_size=(64,64),
+                                                        target_size=(224,224),
                                                         subset='validation')
     return train_generator, validation_generator
 
@@ -80,12 +97,10 @@ def image_preprocessing():
     pass
 
 def main():
-
     pipeline_dataframe = csv_preprocessing(general_info_df)
     train_generator,validation_generator = create_generators(pipeline_dataframe)
-
-    
-    model_CNN(train_generator,validation_generator)
+    #print(pipeline_dataframe)
+    model_sequential(train_generator,validation_generator)
 
     
 
