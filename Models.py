@@ -4,27 +4,6 @@ from tensorflow import keras
 from tensorflow.keras import layers
 from tensorflow.keras.models import Sequential
 
-def model_tf(train_generator,validation_generator):
-    model = Sequential([
-    layers.Rescaling(1./255, input_shape=(224, 224, 3)),
-    layers.Conv2D(16, 3, padding='same', activation='relu'),
-    layers.MaxPooling2D(),
-    layers.Conv2D(32, 3, padding='same', activation='relu'),
-    layers.MaxPooling2D(),
-    layers.Conv2D(64, 3, padding='same', activation='relu'),
-    layers.MaxPooling2D(),
-    layers.Flatten(),
-    layers.Dense(128, activation='relu'),
-    layers.Dense(2)
-    ])
-    model_compiler(model)
-    model_fitter(model,train_generator)
-    model_evaluater(model,validation_generator)
-
-    conf_matrix,correct_value_perc = boolean_conf_matrix(model,validation_generator)
-    print(conf_matrix)
-    print(correct_value_perc)
-
 def model_sequential(train_generator,validation_generator):
     model = tf.keras.models.Sequential([
         tf.keras.layers.Flatten(input_shape=(224 , 224, 3)),
@@ -105,6 +84,9 @@ def VGG_16(train_generator, validation_generator, weights_path=None):
     conf_matrix,correct_value_perc = boolean_conf_matrix(model,validation_generator)
     print(conf_matrix)
     print(correct_value_perc)
+
+
+
 
 
 def model_compiler(model):

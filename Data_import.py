@@ -1,3 +1,6 @@
+
+#!in PASCAL VOC annotations sind bounding boxes für fractures drin!!!
+
 #region imports and settings
 import os
 import numpy as np
@@ -10,6 +13,8 @@ from Models import *
 
 from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
+
+import xml.etree.ElementTree as ET
 #endregion
 
 
@@ -28,7 +33,7 @@ def showimage(name):
     """
 
     #Navigiert path in fractured, bzw. Non_fractured Ordner.
-    os.chdir(os.path.join(os.getcwd(),'Dataset_FracAtlas','images','full_dataset'))
+    os.chdir(os.path.join(os.getcwd(),'Dataset_FracAtlas','images','all'))
     rows = 5
     columns = 5
 
@@ -38,16 +43,28 @@ def showimage(name):
     
     #cwd zurück auf Standard-Ordner setzen
     os.chdir(os.path.join(os.getcwd(),'..','..','..'))
-
+    
+def boundingbox(name,df):
+    #Todo prüfen, ob Bruch vorhanden, noch nicht mit drin
+    #!Prof. Büttner fragen, ob das überhaupt sinn macht, in jpgs reinzuzoomen
+    path = os.path.join(os.getcwd(),'Dataset_FracAtlas','Annotations','PASCAL VOC')
+    os.chdir(path)
+    #print(path)
+    tree = ET.parse(name[:-3]+'xml')
+    root = tree.getroot()
+    
+    
+    
 
 def csv_preprocessing(df):
     """
     Creating csv with Columns ['image_id','fractured'] for dataset input pipeline. Args[df: main dataframe]
     """
 
+    #Datensatz eingegrenzt auf leg
     df = df[df['leg'] == 1]
     df = df.sample(frac = 1)
-    print(df)
+    #print(df)
 
     #inital main dataframe turned into dataset with columns 'image_id' and str('fractured')
     dataset = df[['image_id', 'fractured']].assign(fractured=df['fractured'].astype(str))
@@ -59,7 +76,7 @@ def csv_preprocessing(df):
     to_delete = dataset[boolean_index].head(1749)
     dataset = dataset.drop(to_delete.index)
     dataset = dataset.sample(frac = 1)
-    print(dataset)
+    #print(dataset['fractured'].sum())
     
 
     #print(dataset['fractured'].sum())
@@ -78,7 +95,8 @@ def create_generators(df):
                                                         y_col='fractured',
                                                         class_mode='binary',
                                                         target_size=(224,224),
-                                                        subset='training')
+                                                        subset='training'
+                                                        ,batch_size=16)
 
     validation_generator = datagen.flow_from_dataframe(dataframe=df,
                                                         directory=path,
@@ -86,23 +104,25 @@ def create_generators(df):
                                                         y_col='fractured',
                                                         class_mode='binary',
                                                         target_size=(224,224),
-                                                        subset='validation')
+                                                        subset='validation'
+                                                        ,batch_size=16)
     return train_generator, validation_generator
 
 
 
-#Todo preprocessing in extra file schieben. Neuronales Netz in eigene File, dass es wiederverwendbar ist
 def image_preprocessing():
-    #Todo Überlegen, ob das nicht in create_dataset() mit rein kommt
+    
     pass
 
 def main():
     pipeline_dataframe = csv_preprocessing(general_info_df)
+
+    #boundingbox('IMG0002434.jpg',pipeline_dataframe)
     train_generator,validation_generator = create_generators(pipeline_dataframe)
     #print(pipeline_dataframe)
-    model_sequential(train_generator,validation_generator)
+    model_CNN(train_generator,validation_generator)
 
-    
+    #showimage('IMG0002434.jpg')
 
 if __name__ == "__main__":
     main()
