@@ -55,7 +55,8 @@ def boundingbox(name,df):
     
     
     
-
+#Todo Hardware pictures entfernen
+#Todo Fracture Count = 0 oder =1, Rest rauslöschen
 def csv_preprocessing(df):
     """
     Creating csv with Columns ['image_id','fractured'] for dataset input pipeline. Args[df: main dataframe]
@@ -64,7 +65,7 @@ def csv_preprocessing(df):
     #Datensatz eingegrenzt auf leg
     df = df[df['leg'] == 1]
     df = df.sample(frac = 1)
-    #print(df)
+    print(df)
 
     #inital main dataframe turned into dataset with columns 'image_id' and str('fractured')
     dataset = df[['image_id', 'fractured']].assign(fractured=df['fractured'].astype(str))
@@ -118,9 +119,9 @@ def main():
     pipeline_dataframe = csv_preprocessing(general_info_df)
 
     #boundingbox('IMG0002434.jpg',pipeline_dataframe)
-    train_generator,validation_generator = create_generators(pipeline_dataframe)
-    #print(pipeline_dataframe)
-    model_CNN(train_generator,validation_generator)
+    #train_generator,validation_generator = create_generators(pipeline_dataframe)
+    print(pipeline_dataframe)
+    #model_CNN(train_generator,validation_generator)
 
     #showimage('IMG0002434.jpg')
 
