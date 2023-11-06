@@ -55,7 +55,7 @@ def boundingbox(name,df):
     
     
     
-#Todo Hardware pictures entfernen
+#Todo Hardware & mixed pictures entfernen
 #Todo Fracture Count = 0 oder =1, Rest rauslöschen
 def csv_preprocessing(df):
     """
