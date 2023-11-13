@@ -89,13 +89,13 @@ def create_generators(df):
     """
     datagen = tf.keras.preprocessing.image.ImageDataGenerator(rescale = 1./255, validation_split=0.2)
     path = os.path.join(os.getcwd(),'Dataset_FracAtlas','images','all')
-
+    #Todo k-fold cross validation einbauen. Mal gucken wo das rein muss
     train_generator = datagen.flow_from_dataframe(dataframe=df,
                                                         directory=path,
                                                         x_col='image_id',
                                                         y_col='fractured',
                                                         class_mode='binary',
-                                                        target_size=(224,224),
+                                                        target_size=(64,64),
                                                         subset='training'
                                                         ,batch_size=16)
 
@@ -104,7 +104,7 @@ def create_generators(df):
                                                         x_col='image_id',
                                                         y_col='fractured',
                                                         class_mode='binary',
-                                                        target_size=(224,224),
+                                                        target_size=(64,64),
                                                         subset='validation'
                                                         ,batch_size=16)
     return train_generator, validation_generator
@@ -119,9 +119,9 @@ def main():
     pipeline_dataframe = csv_preprocessing(general_info_df)
 
     #boundingbox('IMG0002434.jpg',pipeline_dataframe)
-    #train_generator,validation_generator = create_generators(pipeline_dataframe)
+    train_generator,validation_generator = create_generators(pipeline_dataframe)
     print(pipeline_dataframe)
-    #model_CNN(train_generator,validation_generator)
+    model_CNN(train_generator,validation_generator)
 
     #showimage('IMG0002434.jpg')
 
