@@ -26,16 +26,22 @@ def model_sequential(train_generator,validation_generator):
 #CNN funktioniert noch überhaupt nicht. Klassifiziert jedes Bild als 1 (=gebrochen)
 def model_CNN(train_generator, validation_generator):
     model = tf.keras.models.Sequential([
-    tf.keras.layers.Conv2D(32, (3, 3), activation='relu', input_shape=(64, 64, 3)),
+    tf.keras.layers.Conv2D(16, (3, 3), activation='relu', input_shape=(128, 128, 3)),
+    tf.keras.layers.MaxPooling2D((2, 2)),
+    tf.keras.layers.Conv2D(32, (3, 3), activation='relu'),
     tf.keras.layers.MaxPooling2D((2, 2)),
     tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
     tf.keras.layers.MaxPooling2D((2, 2)),
     tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
+    tf.keras.layers.MaxPooling2D((2, 2)),
+    tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
+    tf.keras.layers.MaxPooling2D((2, 2)),
     tf.keras.layers.Flatten(),
     tf.keras.layers.Dense(64, activation='relu'),
-    tf.keras.layers.Dense(2)
+    tf.keras.layers.Dense(2,activation='relu')
     ])
     model_compiler(model)
+    model.summary()
     model_fitter(model,train_generator)
     model_evaluater(model,validation_generator)
 

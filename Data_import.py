@@ -31,7 +31,7 @@ def showimage(name):
 
     #Navigiert path in Bilder Ordner
     os.chdir(os.path.join(os.getcwd(),'Dataset_FracAtlas','images','all'))
-
+    
 
     #Plots erstellen, Laden  des Bildes
     fig,ax = plt.subplots()
@@ -48,8 +48,11 @@ def showimage(name):
     #zeigt PLot an
     plt.show()
     
+#Todo 
+def image_preprocessing(name):
+    pass
 
-    
+
 def boundingbox(name,fig,ax):
     #Pathing in xml Ordner
     path = os.path.join(os.getcwd(),'Dataset_FracAtlas','Annotations','PASCAL VOC')
@@ -76,12 +79,7 @@ def boundingbox(name,fig,ax):
     
     return bounding_box
 
-    
-    
-    
-    
-#Todo Hardware & mixed pictures entfernen
-#Todo Fracture Count = 0 oder =1, Rest rauslöschen
+
 #Todo nicht zu viele negative bilder rauslöschen, loss function anpassen
 def csv_preprocessing(df):
     """
@@ -93,7 +91,7 @@ def csv_preprocessing(df):
     df = df[df['hardware'] == 0]
     df = df[(df['fracture_count'] == 0) | (df['fracture_count'] == 1)]
     df = df.sample(frac = 1)
-    print(df['fractured'].sum())
+    #print(df['fractured'].sum())
 
     #inital main dataframe turned into dataset with columns 'image_id' and str('fractured')
     dataset = df[['image_id', 'fractured']].assign(fractured=df['fractured'].astype(str))
@@ -110,7 +108,7 @@ def csv_preprocessing(df):
 
 
 #Todo k-fold cross validation einbauen. Mal gucken wo das rein muss
-def create_generators(df):
+def create_generators(df,targetsize):
     """
     Creates a training image dataset and a validation image dataset. Args[df: preprocessed dataframe]
     """
@@ -122,36 +120,35 @@ def create_generators(df):
                                                         x_col='image_id',
                                                         y_col='fractured',
                                                         class_mode='binary',
-                                                        target_size=(64,64),
+                                                        target_size=targetsize,
                                                         subset='training'
-                                                        ,batch_size=16)
+                                                        ,batch_size=32)
 
     validation_generator = datagen.flow_from_dataframe(dataframe=df,
                                                         directory=path,
                                                         x_col='image_id',
                                                         y_col='fractured',
                                                         class_mode='binary',
-                                                        target_size=(64,64),
+                                                        target_size=targetsize,
                                                         subset='validation'
-                                                        ,batch_size=16)
+                                                        ,batch_size=32)
     return train_generator, validation_generator
 
 
-#Todo 
-def image_preprocessing():
+
     
-    pass
 
 def main():
     pipeline_dataframe = csv_preprocessing(general_info_df)
 
-    #boundingbox('IMG0002434.jpg',pipeline_dataframe)
-    #train_generator,validation_generator = create_generators(pipeline_dataframe)
-    print(pipeline_dataframe)
-    #model_CNN(train_generator,validation_generator)
+    
+    targetsize = (128,128)
+    train_generator,validation_generator = create_generators(pipeline_dataframe,targetsize)
+    #print(pipeline_dataframe)
+    model_CNN(train_generator,validation_generator)
 
 
-    showimage('IMG0000057.jpg')
+    #showimage('IMG0000057.jpg')
 
 if __name__ == "__main__":
     main()
