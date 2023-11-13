@@ -4,6 +4,8 @@ from tensorflow import keras
 from tensorflow.keras import layers
 from tensorflow.keras.models import Sequential
 
+
+
 def model_sequential(train_generator,validation_generator):
     model = tf.keras.models.Sequential([
         tf.keras.layers.Flatten(input_shape=(224 , 224, 3)),
