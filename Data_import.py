@@ -1,20 +1,17 @@
-
-#!in PASCAL VOC annotations sind bounding boxes für fractures drin!!!
-
 #region imports and settings
 import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
+import matplotlib.patches as patches
 import tensorflow as tf
+import xml.etree.ElementTree as ET
 
 from Models import *
 
 from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
-
-import xml.etree.ElementTree as ET
 #endregion
 
 
@@ -32,40 +29,71 @@ def showimage(name):
     Shows images using matplotlib package. Args[name: 'image_id.jpg']
     """
 
-    #Navigiert path in fractured, bzw. Non_fractured Ordner.
+    #Navigiert path in Bilder Ordner
     os.chdir(os.path.join(os.getcwd(),'Dataset_FracAtlas','images','all'))
-    rows = 5
-    columns = 5
 
-    #Laden und Anzeigen des Bildes
-    plt.imshow(mpimg.imread(name),cmap='gray')
-    plt.show()
-    
+
+    #Plots erstellen, Laden  des Bildes
+    fig,ax = plt.subplots()
+    ax.imshow(mpimg.imread(name),cmap='gray')
+
     #cwd zurück auf Standard-Ordner setzen
     os.chdir(os.path.join(os.getcwd(),'..','..','..'))
     
-def boundingbox(name,df):
-    #Todo prüfen, ob Bruch vorhanden, noch nicht mit drin
-    #!Prof. Büttner fragen, ob das überhaupt sinn macht, in jpgs reinzuzoomen
+    #Falls Bruch, wird boundingbox auf plot gelegt
+    if general_info_df.loc[general_info_df['image_id'] == name, 'fractured'].values == 1:
+        rectangle = boundingbox(name,fig,ax)
+        ax.add_patch(rectangle)
+
+    #zeigt PLot an
+    plt.show()
+    
+
+    
+def boundingbox(name,fig,ax):
+    #Pathing in xml Ordner
     path = os.path.join(os.getcwd(),'Dataset_FracAtlas','Annotations','PASCAL VOC')
     os.chdir(path)
-    #print(path)
+
+    #Tree initialisieren
     tree = ET.parse(name[:-3]+'xml')
     root = tree.getroot()
+
+    #Pathing zurück auf Standard-Ordner
+    os.chdir(os.path.join(os.getcwd(),'..','..','..'))
+    
+    #Werte aus bndbox element aus XML ziehen
+    values = []
+    for x in root[5][4]:
+        values.append(int(x.text))
+    
+    #reassign value 2 und 3, da wir width & height brauchen statt 4 koordinaten für patches.rectangle
+    values[2] = values[2]-values[0]
+    values[3] = values[3]-values[1]
+
+    #Rechteck wird festgelegt
+    bounding_box = patches.Rectangle([values[0],values[1]],width=values[2],height=values[3],linewidth=1,edgecolor='r',facecolor='none')
+    
+    return bounding_box
+
+    
     
     
     
 #Todo Hardware & mixed pictures entfernen
 #Todo Fracture Count = 0 oder =1, Rest rauslöschen
+#Todo nicht zu viele negative bilder rauslöschen, loss function anpassen
 def csv_preprocessing(df):
     """
     Creating csv with Columns ['image_id','fractured'] for dataset input pipeline. Args[df: main dataframe]
     """
 
-    #Datensatz eingegrenzt auf leg
-    df = df[df['leg'] == 1]
+    #Datensatz eingegrenzt
+    #df = df[df['leg'] == 1]
+    df = df[df['hardware'] == 0]
+    df = df[(df['fracture_count'] == 0) | (df['fracture_count'] == 1)]
     df = df.sample(frac = 1)
-    print(df)
+    print(df['fractured'].sum())
 
     #inital main dataframe turned into dataset with columns 'image_id' and str('fractured')
     dataset = df[['image_id', 'fractured']].assign(fractured=df['fractured'].astype(str))
@@ -74,22 +102,21 @@ def csv_preprocessing(df):
     #Datensatz auf ähnliche Anzahl 0 und 1 aufteilen.
     #dataset = dataset.sample(frac = 1)
     boolean_index = (dataset['fractured'] == '0')
-    to_delete = dataset[boolean_index].head(1749)
+    to_delete = dataset[boolean_index].head(2883)
     dataset = dataset.drop(to_delete.index)
     dataset = dataset.sample(frac = 1)
     #print(dataset['fractured'].sum())
-    
-
-    #print(dataset['fractured'].sum())
     return dataset
 
+
+#Todo k-fold cross validation einbauen. Mal gucken wo das rein muss
 def create_generators(df):
     """
     Creates a training image dataset and a validation image dataset. Args[df: preprocessed dataframe]
     """
     datagen = tf.keras.preprocessing.image.ImageDataGenerator(rescale = 1./255, validation_split=0.2)
     path = os.path.join(os.getcwd(),'Dataset_FracAtlas','images','all')
-    #Todo k-fold cross validation einbauen. Mal gucken wo das rein muss
+    
     train_generator = datagen.flow_from_dataframe(dataframe=df,
                                                         directory=path,
                                                         x_col='image_id',
@@ -110,7 +137,7 @@ def create_generators(df):
     return train_generator, validation_generator
 
 
-
+#Todo 
 def image_preprocessing():
     
     pass
@@ -119,11 +146,12 @@ def main():
     pipeline_dataframe = csv_preprocessing(general_info_df)
 
     #boundingbox('IMG0002434.jpg',pipeline_dataframe)
-    train_generator,validation_generator = create_generators(pipeline_dataframe)
+    #train_generator,validation_generator = create_generators(pipeline_dataframe)
     print(pipeline_dataframe)
-    model_CNN(train_generator,validation_generator)
+    #model_CNN(train_generator,validation_generator)
 
-    #showimage('IMG0002434.jpg')
+
+    showimage('IMG0000057.jpg')
 
 if __name__ == "__main__":
     main()
