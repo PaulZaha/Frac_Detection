@@ -23,10 +23,48 @@ def model_sequential(train_generator,validation_generator):
     print(conf_matrix)
     print(correct_value_perc)
     
-#CNN funktioniert noch überhaupt nicht. Klassifiziert jedes Bild als 1 (=gebrochen)
-def model_CNN(train_generator, validation_generator):
+
+
+
+def model_CNN(train_generator,validation_generator,weight):
     model = tf.keras.models.Sequential([
-    tf.keras.layers.Conv2D(16, (3, 3), activation='relu', input_shape=(128, 128, 3)),
+    # Note the input shape is the desired size of the image 200x200 with 3 bytes color
+    # This is the first convolution
+    tf.keras.layers.Conv2D(32, (3,3), activation='relu', input_shape=(373, 373, 3)),
+    tf.keras.layers.MaxPooling2D(2, 2),
+
+    tf.keras.layers.Conv2D(64, (3,3), activation='relu'),
+    tf.keras.layers.MaxPooling2D(2,2),
+
+    tf.keras.layers.Conv2D(128, (3,3), activation='relu'),
+    tf.keras.layers.MaxPooling2D(2,2),
+
+    tf.keras.layers.Conv2D(128, (3,3), activation='relu'),
+    tf.keras.layers.MaxPooling2D(2,2),
+
+
+
+
+
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(512, activation='relu'),
+    tf.keras.layers.Dense(1, activation='sigmoid')
+    ])
+
+    model_compiler(model)
+    model.summary()
+    model_fitter(model,train_generator,weight)
+    model_evaluater(model,validation_generator)
+
+    conf_matrix,correct_value_perc = boolean_conf_matrix(model,validation_generator)
+    print(conf_matrix)
+    print(correct_value_perc)
+
+
+#CNN funktioniert noch überhaupt nicht. Klassifiziert jedes Bild als 1 (=gebrochen)
+def model_CNN_old(train_generator, validation_generator):
+    model = tf.keras.models.Sequential([
+    tf.keras.layers.Conv2D(16, (3, 3), activation='relu', input_shape=(300, 300, 3)),
     tf.keras.layers.MaxPooling2D((2, 2)),
     tf.keras.layers.Conv2D(32, (3, 3), activation='relu'),
     tf.keras.layers.MaxPooling2D((2, 2)),
@@ -37,8 +75,8 @@ def model_CNN(train_generator, validation_generator):
     tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
     tf.keras.layers.MaxPooling2D((2, 2)),
     tf.keras.layers.Flatten(),
-    tf.keras.layers.Dense(64, activation='relu'),
-    tf.keras.layers.Dense(2,activation='relu')
+    tf.keras.layers.Dense(512, activation='relu'),
+    tf.keras.layers.Dense(1,activation='sigmoid')
     ])
     model_compiler(model)
     model.summary()
@@ -50,60 +88,15 @@ def model_CNN(train_generator, validation_generator):
     print(correct_value_perc)
 
 
-def VGG_16(train_generator, validation_generator, weights_path=None):
-    model = tf.keras.models.Sequential([
-    tf.keras.layers.Input(shape=(224, 224, 3)),  # Removed the ZeroPadding2D layer for input
-
-    tf.keras.layers.Conv2D(64, (3, 3), activation='relu', padding='same'),  # Use 'same' padding
-    tf.keras.layers.Conv2D(64, (3, 3), activation='relu', padding='same'),
-    tf.keras.layers.MaxPooling2D((2, 2), strides=(2, 2)),
-
-    tf.keras.layers.Conv2D(128, (3, 3), activation='relu', padding='same'),
-    tf.keras.layers.Conv2D(128, (3, 3), activation='relu', padding='same'),
-    tf.keras.layers.MaxPooling2D((2, 2), strides=(2, 2)),
-
-    tf.keras.layers.Conv2D(256, (3, 3), activation='relu', padding='same'),
-    tf.keras.layers.Conv2D(256, (3, 3), activation='relu', padding='same'),
-    tf.keras.layers.Conv2D(256, (3, 3), activation='relu', padding='same'),
-    tf.keras.layers.MaxPooling2D((2, 2), strides=(2, 2)),
-
-    tf.keras.layers.Conv2D(512, (3, 3), activation='relu', padding='same'),
-    tf.keras.layers.Conv2D(512, (3, 3), activation='relu', padding='same'),
-    tf.keras.layers.Conv2D(512, (3, 3), activation='relu', padding='same'),
-    tf.keras.layers.MaxPooling2D((2, 2), strides=(2, 2)),
-
-    tf.keras.layers.Conv2D(512, (3, 3), activation='relu', padding='same'),
-    tf.keras.layers.Conv2D(512, (3, 3), activation='relu', padding='same'),
-    tf.keras.layers.Conv2D(512, (3, 3), activation='relu', padding='same'),
-    tf.keras.layers.MaxPooling2D((2, 2), strides=(2, 2)),
-
-    tf.keras.layers.Flatten(),
-    tf.keras.layers.Dense(4096, activation='relu'),
-    tf.keras.layers.Dropout(0.5),
-    tf.keras.layers.Dense(4096, activation='relu'),
-    tf.keras.layers.Dropout(0.5),
-    tf.keras.layers.Dense(2, activation='softmax')
-    ])
-    
-    model_compiler(model)
-    model_fitter(model,train_generator)
-    model_evaluater(model,validation_generator)
-
-    conf_matrix,correct_value_perc = boolean_conf_matrix(model,validation_generator)
-    print(conf_matrix)
-    print(correct_value_perc)
-
-
-
 
 
 def model_compiler(model):
     model.compile(optimizer='adam',
-            loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+            loss='binary_crossentropy',
             metrics=['accuracy'])
     
-def model_fitter(model,train_generator):
-    model.fit(train_generator,epochs=3)
+def model_fitter(model,train_generator,weight):
+    model.fit(train_generator,epochs=5,class_weight = {0: 1, 1: weight})
 
 def model_evaluater(model,validation_generator):
     model.evaluate(validation_generator,verbose=1)

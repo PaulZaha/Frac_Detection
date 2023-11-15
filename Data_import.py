@@ -90,21 +90,17 @@ def csv_preprocessing(df):
     #df = df[df['leg'] == 1]
     df = df[df['hardware'] == 0]
     df = df[(df['fracture_count'] == 0) | (df['fracture_count'] == 1)]
-    df = df.sample(frac = 1)
-    #print(df['fractured'].sum())
+
 
     #inital main dataframe turned into dataset with columns 'image_id' and str('fractured')
     dataset = df[['image_id', 'fractured']].assign(fractured=df['fractured'].astype(str))
-    
 
-    #Datensatz auf ähnliche Anzahl 0 und 1 aufteilen.
-    #dataset = dataset.sample(frac = 1)
-    boolean_index = (dataset['fractured'] == '0')
-    to_delete = dataset[boolean_index].head(2883)
-    dataset = dataset.drop(to_delete.index)
-    dataset = dataset.sample(frac = 1)
-    #print(dataset['fractured'].sum())
-    return dataset
+    dataset = dataset.sample(frac = 0.2)
+
+    #!Gewicht, da non-fractured und fractured nicht gleich viele. Wird übergeben in model
+    gewicht = int(round(((dataset['fractured'].value_counts()).get(0,1))/(dataset['fractured'].value_counts()).get(1,0),0))
+    print(gewicht)
+    return dataset, gewicht
 
 
 #Todo k-fold cross validation einbauen. Mal gucken wo das rein muss
@@ -139,13 +135,13 @@ def create_generators(df,targetsize):
     
 
 def main():
-    pipeline_dataframe = csv_preprocessing(general_info_df)
+    pipeline_dataframe, gewicht = csv_preprocessing(general_info_df)
 
     
-    targetsize = (128,128)
+    targetsize = (373,373)
     train_generator,validation_generator = create_generators(pipeline_dataframe,targetsize)
-    #print(pipeline_dataframe)
-    model_CNN(train_generator,validation_generator)
+    print(pipeline_dataframe)
+    model_CNN(train_generator,validation_generator,gewicht)
 
 
     #showimage('IMG0000057.jpg')
