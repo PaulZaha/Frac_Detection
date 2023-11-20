@@ -4,6 +4,8 @@ from tensorflow import keras
 from tensorflow.keras import layers
 from tensorflow.keras.models import Sequential
 
+from Data_import import *
+
 
 
 def model_sequential(train_generator,validation_generator):
@@ -28,23 +30,26 @@ def model_sequential(train_generator,validation_generator):
 
 def model_CNN(train_generator,validation_generator,weight):
     model = tf.keras.models.Sequential([
-    # Note the input shape is the desired size of the image 200x200 with 3 bytes color
-    # This is the first convolution
-    tf.keras.layers.Conv2D(32, (3,3), activation='relu', input_shape=(373, 373, 3)),
+    tf.keras.layers.Resizing(100,100),
+
+    tf.keras.layers.RandomFlip("horizontal_and_vertical"),
+    #tf.keras.layers.RandomRotation(factor=(-0.2,0.2),fill_mode="reflect"),
+
+    tf.keras.layers.Conv2D(32, (3,3), activation='relu'),
     tf.keras.layers.MaxPooling2D(2, 2),
+    #tf.keras.layers.Dropout(0.5),
 
     tf.keras.layers.Conv2D(64, (3,3), activation='relu'),
     tf.keras.layers.MaxPooling2D(2,2),
+    #tf.keras.layers.Dropout(0.5),
 
     tf.keras.layers.Conv2D(128, (3,3), activation='relu'),
     tf.keras.layers.MaxPooling2D(2,2),
+    #tf.keras.layers.Dropout(0.5),
 
     tf.keras.layers.Conv2D(128, (3,3), activation='relu'),
     tf.keras.layers.MaxPooling2D(2,2),
-
-
-
-
+    #tf.keras.layers.Dropout(0.5),
 
     tf.keras.layers.Flatten(),
     tf.keras.layers.Dense(512, activation='relu'),
@@ -52,7 +57,7 @@ def model_CNN(train_generator,validation_generator,weight):
     ])
 
     model_compiler(model)
-    model.summary()
+    #model.summary()
     model_fitter(model,train_generator,weight)
     model_evaluater(model,validation_generator)
 
@@ -86,8 +91,6 @@ def model_CNN_old(train_generator, validation_generator):
     conf_matrix,correct_value_perc = boolean_conf_matrix(model,validation_generator)
     print(conf_matrix)
     print(correct_value_perc)
-
-
 
 
 def model_compiler(model):
