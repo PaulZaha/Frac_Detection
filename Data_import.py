@@ -90,7 +90,7 @@ def csv_preprocessing(df):
     #Datensatz eingegrenzt
     #df = df[df['leg'] == 1]
     df = df[df['hardware'] == 0]
-    df = df[(df['fracture_count'] == 0) | (df['fracture_count'] == 1)]
+    #df = df[(df['fracture_count'] == 0) | (df['fracture_count'] == 1)]
 
 
     #inital main dataframe turned into dataset with columns 'image_id' and str('fractured')
