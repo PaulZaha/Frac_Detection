@@ -96,7 +96,7 @@ def csv_preprocessing(df):
     #inital main dataframe turned into dataset with columns 'image_id' and str('fractured')
     dataset = df[['image_id', 'fractured']].assign(fractured=df['fractured'].astype(str))
 
-    dataset = dataset.sample(frac = 0.4)
+    dataset = dataset.sample(frac = 0.2)
 
     #!Gewicht, da non-fractured und fractured nicht gleich viele. Wird übergeben in model
     gewicht = int(round(((dataset['fractured'].value_counts()).get(0,1))/(dataset['fractured'].value_counts()).get(1,0),0))
@@ -110,7 +110,7 @@ def create_generators(df,targetsize):
     """
     Creates a training image dataset and a validation image dataset. Args[df: preprocessed dataframe]
     """
-    datagen = tf.keras.preprocessing.image.ImageDataGenerator(rescale = 1./255, validation_split=0.2)
+    datagen = tf.keras.preprocessing.image.ImageDataGenerator(rescale = 1./255, rotation_range=20, brightness_range=[1.5,1.5],fill_mode='nearest', validation_split=0.2)
     path = os.path.join(os.getcwd(),'Dataset_FracAtlas','images','all')
     
     train_generator = datagen.flow_from_dataframe(dataframe=df,
@@ -132,7 +132,10 @@ def create_generators(df,targetsize):
                                                         ,batch_size=32)
     return train_generator, validation_generator
 
-
+def on_train_begin(self, logs =  {}):
+    self.metrics = {}
+    for metrics in logs:
+        self.metrics[metric] = []
 
     
 
@@ -144,7 +147,6 @@ def main():
     train_generator,validation_generator = create_generators(pipeline_dataframe,targetsize)
     print(pipeline_dataframe)
     model_CNN(train_generator,validation_generator,gewicht)
-
 
     #showimage('IMG0000057.jpg')
 

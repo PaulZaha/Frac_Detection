@@ -61,37 +61,15 @@ def model_CNN(train_generator,validation_generator,weight):
     model_fitter(model,train_generator,weight)
     model_evaluater(model,validation_generator)
 
-    conf_matrix,correct_value_perc = boolean_conf_matrix(model,validation_generator)
-    print(conf_matrix)
-    print(correct_value_perc)
-
-
-#CNN funktioniert noch überhaupt nicht. Klassifiziert jedes Bild als 1 (=gebrochen)
-def model_CNN_old(train_generator, validation_generator):
-    model = tf.keras.models.Sequential([
-    tf.keras.layers.Conv2D(16, (3, 3), activation='relu', input_shape=(300, 300, 3)),
-    tf.keras.layers.MaxPooling2D((2, 2)),
-    tf.keras.layers.Conv2D(32, (3, 3), activation='relu'),
-    tf.keras.layers.MaxPooling2D((2, 2)),
-    tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
-    tf.keras.layers.MaxPooling2D((2, 2)),
-    tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
-    tf.keras.layers.MaxPooling2D((2, 2)),
-    tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
-    tf.keras.layers.MaxPooling2D((2, 2)),
-    tf.keras.layers.Flatten(),
-    tf.keras.layers.Dense(512, activation='relu'),
-    tf.keras.layers.Dense(1,activation='sigmoid')
-    ])
-    model_compiler(model)
-    model.summary()
-    model_fitter(model,train_generator)
-    model_evaluater(model,validation_generator)
+    
 
     conf_matrix,correct_value_perc = boolean_conf_matrix(model,validation_generator)
     print(conf_matrix)
     print(correct_value_perc)
 
+
+
+    
 
 def model_compiler(model):
     model.compile(optimizer='adam',
@@ -99,10 +77,16 @@ def model_compiler(model):
             metrics=['accuracy'])
     
 def model_fitter(model,train_generator,weight):
-    model.fit(train_generator,epochs=5,class_weight = {0: 1, 1: weight})
+    history = model.fit(train_generator,epochs=3,class_weight = {0: 1, 1: weight})
+    print(history.history.keys())
+
+    plt.plot(history.history['accuracy'])
+    plt.plot(history.history['loss'])
+    plt.show()
 
 def model_evaluater(model,validation_generator):
     model.evaluate(validation_generator,verbose=1)
+
 
 def boolean_conf_matrix(model,generator):
     true_labels = np.array(generator.classes)
