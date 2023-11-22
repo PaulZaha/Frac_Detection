@@ -3,34 +3,86 @@ import numpy as np
 from tensorflow import keras
 from tensorflow.keras import layers
 from tensorflow.keras.models import Sequential
+from tensorflow.keras.applications import VGG16
+from tensorflow.keras.applications import VGG19
+
+import matplotlib.pyplot as PLT
+
 
 from Data_import import *
 
 
 
-def model_sequential(train_generator,validation_generator):
-    model = tf.keras.models.Sequential([
-        tf.keras.layers.Flatten(input_shape=(224 , 224, 3)),
-        tf.keras.layers.Dense(128, activation='relu'),
-        tf.keras.layers.Dropout(0.2),
-        tf.keras.layers.Dense(2, activation='softmax')
-    ])
-    
-    #model.summary()
-    model_compiler(model)
-    model_fitter(model,train_generator)
-    model_evaluater(model,validation_generator)
+def vgg16(train_generator,validation_generator,weight):
+    #Set input layer
+    input_layer = layers.Input(shape=(224,224,3))
 
+    #VGG16 reinziehen
+    model_vgg16=VGG16(weights='imagenet',input_tensor=input_layer,include_top=False)
+
+    #Flatten und Classifier hinzufügen
+    flatten=tf.keras.layers.Flatten()
+    classifier = tf.keras.layers.Dense(1,activation='softmax')
+
+    #Model zusammenfügen
+    model = tf.keras.models.Sequential([
+        model_vgg16,
+        flatten,
+        classifier
+    ])
+
+    #Layer untrainable machen
+    for layer in model.layers[:-1]:
+        layer.trainable=False
+
+    model_vgg16.summary()
+    model.summary()
+
+    model_compiler(model)
+    model_fitter(model,train_generator,validation_generator,weight)
+
+    #Confusion matrix anzeigen
     conf_matrix,correct_value_perc = boolean_conf_matrix(model,validation_generator)
     print(conf_matrix)
     print(correct_value_perc)
-    
 
+def vgg19(train_generator,validation_generator,weight):
+    #Set input layer
+    input_layer = layers.Input(shape=(224,224,3))
 
+    #VGG16 reinziehen
+    model_vgg19=VGG19(weights='imagenet',input_tensor=input_layer,include_top=False)
+
+    #Flatten und Classifier hinzufügen
+    flatten=tf.keras.layers.Flatten()
+    #dense1=tf.keras.layers.Dense()
+    classifier = tf.keras.layers.Dense(1,activation='sigmoid')
+
+    #Model zusammenfügen
+    model = tf.keras.models.Sequential([
+        model_vgg19,
+        flatten,
+        classifier
+    ])
+
+    #Layer untrainable machen
+    for layer in model.layers[:-1]:
+        layer.trainable=False
+
+    model_vgg19.summary()
+    model.summary()
+
+    model_compiler(model)
+    model_fitter(model,train_generator,validation_generator,weight)
+
+    #Confusion matrix anzeigen
+    conf_matrix,correct_value_perc = boolean_conf_matrix(model,validation_generator)
+    print(conf_matrix)
+    print(correct_value_perc)
 
 def model_CNN(train_generator,validation_generator,weight):
     model = tf.keras.models.Sequential([
-    tf.keras.layers.Resizing(100,100),
+    tf.keras.layers.Resizing(373,373),
 
     tf.keras.layers.RandomFlip("horizontal_and_vertical"),
     #tf.keras.layers.RandomRotation(factor=(-0.2,0.2),fill_mode="reflect"),
@@ -61,32 +113,30 @@ def model_CNN(train_generator,validation_generator,weight):
     model_fitter(model,train_generator,weight)
     model_evaluater(model,validation_generator)
 
-    
 
     conf_matrix,correct_value_perc = boolean_conf_matrix(model,validation_generator)
     print(conf_matrix)
     print(correct_value_perc)
 
 
-    
-
 def model_compiler(model):
     model.compile(optimizer='adam',
             loss='binary_crossentropy',
             metrics=['accuracy'])
     
-def model_fitter(model,train_generator,weight):
-    history = model.fit(train_generator,epochs=30,class_weight = {0: 1, 1: weight})
-    print(history.history.keys())
+def model_fitter(model,train_generator,validation_generator,weight):
+    history = model.fit(train_generator,validation_data=validation_generator,epochs=5
+                        ,class_weight = {0: 1, 1: weight}
+                        )
+
 
     #Plotting accuracy and loss over epoch time
     plt.plot(history.history['accuracy'], label = 'accuracy')
     plt.plot(history.history['loss'], label = 'loss')
+    plt.plot(history.history['val_accuracy'],label='validation accuracy')
+    plt.plot(history.history['val_loss'], label = 'validation loss')
     plt.legend()
     plt.show()
-
-def model_evaluater(model,validation_generator):
-    model.evaluate(validation_generator,verbose=1)
 
 
 def boolean_conf_matrix(model,generator):
