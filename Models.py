@@ -68,7 +68,6 @@ def model_CNN(train_generator,validation_generator,weight):
     print(correct_value_perc)
 
 
-
     
 
 def model_compiler(model):
@@ -77,11 +76,13 @@ def model_compiler(model):
             metrics=['accuracy'])
     
 def model_fitter(model,train_generator,weight):
-    history = model.fit(train_generator,epochs=3,class_weight = {0: 1, 1: weight})
+    history = model.fit(train_generator,epochs=30,class_weight = {0: 1, 1: weight})
     print(history.history.keys())
 
-    plt.plot(history.history['accuracy'])
-    plt.plot(history.history['loss'])
+    #Plotting accuracy and loss over epoch time
+    plt.plot(history.history['accuracy'], label = 'accuracy')
+    plt.plot(history.history['loss'], label = 'loss')
+    plt.legend()
     plt.show()
 
 def model_evaluater(model,validation_generator):
