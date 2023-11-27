@@ -122,7 +122,7 @@ def model_CNN(train_generator,validation_generator,weight):
 
 def model_compiler(model):
     model.compile(optimizer='Adam',
-            loss='binary_crossentropy',
+            loss='binary_crossentropy', #evtl binary_focal_crossentropy
             metrics=['BinaryAccuracy'])
     
 def model_fitter(model,train_generator,validation_generator,weight):
