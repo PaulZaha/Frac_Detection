@@ -1,0 +1,29 @@
+Fragen:
+
+Vor classifier noch eine Dense schicht? Was macht das für unterschied?
+
+Binary classification mit vielen nonfractures und wenigen fractures. Wie vergleichbarkeit zu anderen studien? z.B. wird 
+
+
+
+
+Viel mehr bilder zum durchlaufen nehmen
+Data augmentation verdoppelt die bilder, WIEDER MIT REINNEHMEN
+
+
+Matrix gleich viele anteile nehmen
+
+
+Patience mit angeben!! Tensorflow?!
+ abbruch der epochs, wenn alles gleich bleibt
+
+
+
+Hyperparameter tunen
+
+
+
+3-4 größten Modelle
+Inception, resnet, vgg16, vgg19
+Benchmarking
+

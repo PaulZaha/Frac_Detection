@@ -55,18 +55,19 @@ def vgg19(train_generator,validation_generator,weight):
 
     #Flatten und Classifier hinzufügen
     flatten=tf.keras.layers.Flatten()
-    #dense1=tf.keras.layers.Dense()
+    dense1=tf.keras.layers.Dense(512,activation='relu')
     classifier = tf.keras.layers.Dense(1,activation='sigmoid')
 
     #Model zusammenfügen
     model = tf.keras.models.Sequential([
         model_vgg19,
         flatten,
+        #dense1,
         classifier
     ])
 
     #Layer untrainable machen
-    for layer in model.layers[:-1]:
+    for layer in model.layers[:-2]: #auf -1 ändern, wenn nur der finale classifier und keine Dense schicht
         layer.trainable=False
 
     model_vgg19.summary()
@@ -120,20 +121,20 @@ def model_CNN(train_generator,validation_generator,weight):
 
 
 def model_compiler(model):
-    model.compile(optimizer='adam',
+    model.compile(optimizer='Adam',
             loss='binary_crossentropy',
-            metrics=['accuracy'])
+            metrics=['BinaryAccuracy'])
     
 def model_fitter(model,train_generator,validation_generator,weight):
-    history = model.fit(train_generator,validation_data=validation_generator,epochs=5
+    history = model.fit(train_generator,validation_data=validation_generator,epochs=10
                         ,class_weight = {0: 1, 1: weight}
                         )
 
 
     #Plotting accuracy and loss over epoch time
-    plt.plot(history.history['accuracy'], label = 'accuracy')
+    plt.plot(history.history['binary_accuracy'], label = 'accuracy')
     plt.plot(history.history['loss'], label = 'loss')
-    plt.plot(history.history['val_accuracy'],label='validation accuracy')
+    plt.plot(history.history['val_binary_accuracy'],label='validation accuracy')
     plt.plot(history.history['val_loss'], label = 'validation loss')
     plt.legend()
     plt.show()

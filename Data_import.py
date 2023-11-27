@@ -48,12 +48,6 @@ def showimage(name):
     #zeigt PLot an
     plt.show()
     
-#Todo 
-def image_preprocessing():
-    pass
-    
-
-
 def boundingbox(name,fig,ax):
     #Pathing in xml Ordner
     path = os.path.join(os.getcwd(),'Dataset_FracAtlas','Annotations','PASCAL VOC')
@@ -90,14 +84,14 @@ def csv_preprocessing(df):
     #Datensatz eingegrenzt
     #df = df.sample(frac = 1)
     #df = df[df['leg'] == 1]
-    df = df[df['hardware'] == 0]
+    #df = df[df['hardware'] == 0]
     #df = df[(df['fracture_count'] == 0) | (df['fracture_count'] == 1)]
 
 
     #inital main dataframe turned into dataset with columns 'image_id' and str('fractured')
     dataset = df[['image_id', 'fractured']].assign(fractured=df['fractured'].astype(str))
 
-    dataset = dataset.sample(frac = 0.2)
+    dataset = dataset.sample(frac = 1)
 
     #!Gewicht, da non-fractured und fractured nicht gleich viele. Wird übergeben in model
     gewicht = round(((dataset['fractured'].value_counts()).get(0,1))/(dataset['fractured'].value_counts()).get(1,0),3)
