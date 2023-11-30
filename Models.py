@@ -5,6 +5,12 @@ from tensorflow.keras import layers
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.applications import VGG16
 from tensorflow.keras.applications import VGG19
+from tensorflow.keras.applications import DenseNet201
+from tensorflow.keras.applications import InceptionV3
+from tensorflow.keras.applications import ResNet152V2
+from tensorflow.keras.applications import Xception
+
+
 
 import matplotlib.pyplot as PLT
 
@@ -50,7 +56,7 @@ def vgg19(train_generator,validation_generator,weight):
     #Set input layer
     input_layer = layers.Input(shape=(224,224,3))
 
-    #VGG16 reinziehen
+    #VGG19 reinziehen
     model_vgg19=VGG19(weights='imagenet',input_tensor=input_layer,include_top=False)
 
     #Flatten und Classifier hinzufügen
@@ -81,40 +87,123 @@ def vgg19(train_generator,validation_generator,weight):
     print(conf_matrix)
     print(correct_value_perc)
 
-def model_CNN(train_generator,validation_generator,weight):
+def densenet201(train_generator,validation_generator,weight):
+    
+    input_layer = layers.Input(shape=(224,224,3))
+
+    model_densenet201 = DenseNet201(weights='imagenet',input_tensor = input_layer,include_top = False)
+
+    flatten = tf.keras.layers.Flatten()
+    classifier = tf.keras.layers.Dense(1,activation='sigmoid')
+
     model = tf.keras.models.Sequential([
-    tf.keras.layers.Resizing(373,373),
-
-    tf.keras.layers.RandomFlip("horizontal_and_vertical"),
-    #tf.keras.layers.RandomRotation(factor=(-0.2,0.2),fill_mode="reflect"),
-
-    tf.keras.layers.Conv2D(32, (3,3), activation='relu'),
-    tf.keras.layers.MaxPooling2D(2, 2),
-    #tf.keras.layers.Dropout(0.5),
-
-    tf.keras.layers.Conv2D(64, (3,3), activation='relu'),
-    tf.keras.layers.MaxPooling2D(2,2),
-    #tf.keras.layers.Dropout(0.5),
-
-    tf.keras.layers.Conv2D(128, (3,3), activation='relu'),
-    tf.keras.layers.MaxPooling2D(2,2),
-    #tf.keras.layers.Dropout(0.5),
-
-    tf.keras.layers.Conv2D(128, (3,3), activation='relu'),
-    tf.keras.layers.MaxPooling2D(2,2),
-    #tf.keras.layers.Dropout(0.5),
-
-    tf.keras.layers.Flatten(),
-    tf.keras.layers.Dense(512, activation='relu'),
-    tf.keras.layers.Dense(1, activation='sigmoid')
+        model_densenet201,
+        flatten,
+        classifier
     ])
 
+    #Layer untrainable machen
+    for layer in model.layers[:-2]: #auf -1 ändern, wenn nur der finale classifier und keine Dense schicht
+        layer.trainable=False
+
+    model_densenet201.summary()
+    model.summary()
+
     model_compiler(model)
-    #model.summary()
-    model_fitter(model,train_generator,weight)
-    model_evaluater(model,validation_generator)
+    model_fitter(model,train_generator,validation_generator,weight)
+
+    #Confusion matrix anzeigen
+    conf_matrix,correct_value_perc = boolean_conf_matrix(model,validation_generator)
+    print(conf_matrix)
+    print(correct_value_perc)
 
 
+def InceptionV3(train_generator,validation_generator,weight):
+    
+    input_layer = layers.Input(shape=(224,224,3))
+
+    model_InceptionV3 = InceptionV3(weights='imagenet',input_tensor = input_layer,include_top = False)
+
+    flatten = tf.keras.layers.Flatten()
+    classifier = tf.keras.layers.Dense(1,activation='sigmoid')
+
+    model = tf.keras.models.Sequential([
+        model_InceptionV3,
+        flatten,
+        classifier
+    ])
+
+    #Layer untrainable machen
+    for layer in model.layers[:-2]: #auf -1 ändern, wenn nur der finale classifier und keine Dense schicht
+        layer.trainable=False
+
+    model_InceptionV3.summary()
+    model.summary()
+
+    model_compiler(model)
+    model_fitter(model,train_generator,validation_generator,weight)
+
+    #Confusion matrix anzeigen
+    conf_matrix,correct_value_perc = boolean_conf_matrix(model,validation_generator)
+    print(conf_matrix)
+    print(correct_value_perc)
+
+def ResNet152V2(train_generator,validation_generator,weight):
+    
+    input_layer = layers.Input(shape=(224,224,3))
+
+    model_ResNet152V2 = ResNet152V2(weights='imagenet',input_tensor = input_layer,include_top = False)
+
+    flatten = tf.keras.layers.Flatten()
+    classifier = tf.keras.layers.Dense(1,activation='sigmoid')
+
+    model = tf.keras.models.Sequential([
+        model_ResNet152V2,
+        flatten,
+        classifier
+    ])
+
+    #Layer untrainable machen
+    for layer in model.layers[:-2]: #auf -1 ändern, wenn nur der finale classifier und keine Dense schicht
+        layer.trainable=False
+
+    model_ResNet152V2.summary()
+    model.summary()
+
+    model_compiler(model)
+    model_fitter(model,train_generator,validation_generator,weight)
+
+    #Confusion matrix anzeigen
+    conf_matrix,correct_value_perc = boolean_conf_matrix(model,validation_generator)
+    print(conf_matrix)
+    print(correct_value_perc)
+
+def Xception(train_generator,validation_generator,weight):
+    
+    input_layer = layers.Input(shape=(224,224,3))
+
+    model_Xception = Xception(weights='imagenet',input_tensor = input_layer,include_top = False)
+
+    flatten = tf.keras.layers.Flatten()
+    classifier = tf.keras.layers.Dense(1,activation='sigmoid')
+
+    model = tf.keras.models.Sequential([
+        model_Xception,
+        flatten,
+        classifier
+    ])
+
+    #Layer untrainable machen
+    for layer in model.layers[:-2]: #auf -1 ändern, wenn nur der finale classifier und keine Dense schicht
+        layer.trainable=False
+
+    model_Xception.summary()
+    model.summary()
+
+    model_compiler(model)
+    model_fitter(model,train_generator,validation_generator,weight)
+
+    #Confusion matrix anzeigen
     conf_matrix,correct_value_perc = boolean_conf_matrix(model,validation_generator)
     print(conf_matrix)
     print(correct_value_perc)
