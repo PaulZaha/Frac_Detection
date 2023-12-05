@@ -8,6 +8,9 @@ import matplotlib.patches as patches
 import tensorflow as tf
 import xml.etree.ElementTree as ET
 
+import sklearn
+from sklearn.model_selection import KFold, train_test_split
+
 from Models import *
 
 from PIL import ImageFile
@@ -75,74 +78,91 @@ def boundingbox(name,fig,ax):
     return bounding_box
 
 
-#Todo nicht zu viele negative bilder rauslöschen, loss function anpassen
-def csv_preprocessing(df):
+def preprocessing(df):
     """
     Creating csv with Columns ['image_id','fractured'] for dataset input pipeline. Args[df: main dataframe]
     """
 
-    #Datensatz eingegrenzt
-    #df = df.sample(frac = 1)
-    #df = df[df['leg'] == 1]
-    #df = df[df['hardware'] == 0]
-    #df = df[(df['fracture_count'] == 0) | (df['fracture_count'] == 1)]
-
-
     #inital main dataframe turned into dataset with columns 'image_id' and str('fractured')
     dataset = df[['image_id', 'fractured']].assign(fractured=df['fractured'].astype(str))
+    dataset = dataset.sample(frac = 0.2)
 
-    dataset = dataset.sample(frac = 1)
+    #Datensatz aufgeteilt in 10% Testdaten und 90% Trainingsdaten
+    train_dataset, test_dataset = train_test_split(dataset, train_size = 0.9, shuffle = True)
 
-    #!Gewicht, da non-fractured und fractured nicht gleich viele. Wird übergeben in model
+    #Gewicht, da non-fractured und fractured nicht gleich viele. Wird übergeben in model
     gewicht = round(((dataset['fractured'].value_counts()).get(0,1))/(dataset['fractured'].value_counts()).get(1,0),3)
-    print(dataset['fractured'].value_counts())
-    print(gewicht)
-    return dataset, gewicht
+
+    return train_dataset, test_dataset,gewicht
 
 
-#Todo k-fold cross validation einbauen. Mal gucken wo das rein muss
-def create_generators(df,targetsize):
+#Todo k-fold cross validation einbauen
+def create_generators(train_df,test_df,targetsize):
     """
     Creates a training image dataset and a validation image dataset. Args[df: preprocessed dataframe]
     """
-    datagen = tf.keras.preprocessing.image.ImageDataGenerator(rescale = 1./255
-                                                              #, rotation_range=20,fill_mode='nearest', 
-                                                              ,validation_split=0.2)
+    #Pfad zu Bildern
     path = os.path.join(os.getcwd(),'Dataset_FracAtlas','images','all')
+
+    datagen = tf.keras.preprocessing.image.ImageDataGenerator(rescale = 1./255
+                                                              ,horizontal_flip=True
+                                                              ,rotation_range=10 
+                                                              ,width_shift_range=0.05
+                                                              ,height_shift_range=0.05
+                                                              ,zoom_range=0.1
+                                                              ,validation_split=0.2)
     
-    train_generator = datagen.flow_from_dataframe(dataframe=df,
+    test_datagen = tf.keras.preprocessing.image.ImageDataGenerator(rescale=1./255)
+
+
+    train_generator = datagen.flow_from_dataframe(dataframe=train_df,
                                                         directory=path,
                                                         x_col='image_id',
                                                         y_col='fractured',
                                                         class_mode='binary',
+                                                        color_mode = 'rgb',
+                                                        shuffle=True,
                                                         target_size=targetsize,
                                                         subset='training'
-                                                        ,batch_size=32)
-
-    validation_generator = datagen.flow_from_dataframe(dataframe=df,
+                                                        ,batch_size=16)
+    
+    validation_generator = datagen.flow_from_dataframe(dataframe=train_df,
                                                         directory=path,
                                                         x_col='image_id',
                                                         y_col='fractured',
                                                         class_mode='binary',
+                                                        color_mode = 'rgb',
+                                                        shuffle=True,
                                                         target_size=targetsize,
                                                         subset='validation'
-                                                        ,batch_size=32)
-    return train_generator, validation_generator
+                                                        ,batch_size=16)
+
+    test_generator = test_datagen.flow_from_dataframe(dataframe=test_df,
+                                                      directory=path,
+                                                        x_col='image_id',
+                                                        y_col='fractured',
+                                                        class_mode='binary',
+                                                        color_mode = 'rgb',
+                                                        shuffle=True,
+                                                        target_size=targetsize,
+                                                        batch_size=16)
+
+    
+    return train_generator, validation_generator, test_generator
 
 
 
     
 
 def main():
-    pipeline_dataframe, gewicht = csv_preprocessing(general_info_df)
+    train_dataset, test_dataset, gewicht = preprocessing(general_info_df)
 
     
     targetsize = (224,224)
-    train_generator,validation_generator = create_generators(pipeline_dataframe,targetsize)
-    print(pipeline_dataframe)
-    #model_CNN(train_generator,validation_generator,gewicht)
-    vgg19(train_generator,validation_generator,gewicht)
-    #showimage('IMG0000057.jpg')
+    train_generator,validation_generator, test_generator = create_generators(train_dataset,test_dataset,targetsize)
+
+    InceptionV3(train_generator,validation_generator,test_generator,gewicht)
+    #showimage('IMG0003726.jpg')
 
 if __name__ == "__main__":
     main()
