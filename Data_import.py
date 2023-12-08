@@ -82,10 +82,10 @@ def preprocessing(df):
     """
     Creating csv with Columns ['image_id','fractured'] for dataset input pipeline. Args[df: main dataframe]
     """
-
+    #df = df[df['leg'] == 1]
     #inital main dataframe turned into dataset with columns 'image_id' and str('fractured')
     dataset = df[['image_id', 'fractured']].assign(fractured=df['fractured'].astype(str))
-    dataset = dataset.sample(frac = 0.2)
+    dataset = dataset.sample(frac = 1)
 
     #Datensatz aufgeteilt in 10% Testdaten und 90% Trainingsdaten
     train_dataset, test_dataset = train_test_split(dataset, train_size = 0.9, shuffle = True)

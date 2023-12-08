@@ -100,7 +100,7 @@ def densenet201(train_generator,validation_generator,test_generator,weight):
     ])
 
     #Layer untrainable machen
-    for layer in model.layers[:-2]: #auf -1 ändern, wenn nur der finale classifier und keine Dense schicht
+    for layer in model.layers[:-1]: #auf -1 ändern, wenn nur der finale classifier und keine Dense schicht
         layer.trainable=False
 
 
@@ -126,7 +126,7 @@ def InceptionV3(train_generator,validation_generator,test_generator,weight):
     ])
 
     #Layer untrainable machen
-    for layer in model.layers[:-2]: #auf -1 ändern, wenn nur der finale classifier und keine Dense schicht
+    for layer in model.layers[:-1]: #auf -1 ändern, wenn nur der finale classifier und keine Dense schicht
         layer.trainable=False
 
     model_compiler(model)
@@ -151,7 +151,7 @@ def ResNet152V2(train_generator,validation_generator,test_generator,weight):
     ])
 
     #Layer untrainable machen
-    for layer in model.layers[:-2]: #auf -1 ändern, wenn nur der finale classifier und keine Dense schicht
+    for layer in model.layers[:-1]: #auf -1 ändern, wenn nur der finale classifier und keine Dense schicht
         layer.trainable=False
 
     model_compiler(model)
@@ -168,6 +168,7 @@ def Xception(train_generator,validation_generator,test_generator,weight):
 
     flatten = tf.keras.layers.Flatten()
     classifier = tf.keras.layers.Dense(1,activation='sigmoid')
+
 
     model = tf.keras.models.Sequential([
         model_Xception,
@@ -187,7 +188,7 @@ def Xception(train_generator,validation_generator,test_generator,weight):
 
 
 def model_compiler(model):
-    model.compile(optimizer=tf.keras.optimizers.RMSprop(),
+    model.compile(optimizer=tf.keras.optimizers.Adam(),
             loss=tf.keras.losses.BinaryCrossentropy(), #evtl binary_focal_crossentropy
             metrics=['accuracy'])
     
