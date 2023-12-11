@@ -162,24 +162,29 @@ def ResNet152V2(train_generator,validation_generator,test_generator,weight):
 
 def Xception(train_generator,validation_generator,test_generator,weight):
     
-    input_layer = layers.Input(shape=(224,224,3))
+    input_layer = layers.Input(shape=(373,373,3))
 
     model_Xception = tf.keras.applications.Xception(weights='imagenet',input_tensor = input_layer,include_top = False)
 
     flatten = tf.keras.layers.Flatten()
     classifier = tf.keras.layers.Dense(1,activation='sigmoid')
-
+    globalaverage = tf.keras.layers.GlobalAveragePooling2D()
+    dense1 = tf.keras.layers.Dense(128,activation='relu')
+    dropout = tf.keras.layers.Dropout(0.5)
 
     model = tf.keras.models.Sequential([
         model_Xception,
         flatten,
+        #globalaverage,
+        #dense1,
+        #dropout,
         classifier
     ])
 
     #Layer untrainable machen
-    for layer in model.layers[:-2]: #auf -1 ändern, wenn nur der finale classifier und keine Dense schicht
+    for layer in model.layers[:-1]: #auf -1 ändern, wenn nur der finale classifier und keine Dense schicht
         layer.trainable=False
-
+    model.summary()
     model_compiler(model)
     print("Ab hier: Model Fitting")
     model_fitter(model,train_generator,validation_generator,weight)
@@ -188,23 +193,42 @@ def Xception(train_generator,validation_generator,test_generator,weight):
 
 
 def model_compiler(model):
-    model.compile(optimizer=tf.keras.optimizers.Adam(),
+    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-5),
             loss=tf.keras.losses.BinaryCrossentropy(), #evtl binary_focal_crossentropy
             metrics=['accuracy'])
     
 
 def model_fitter(model,train_generator,validation_generator,weight):
-    history = model.fit(train_generator,validation_data=validation_generator,epochs=10
+    history = model.fit(train_generator,validation_data=validation_generator,epochs=5
                         ,class_weight = {0: 1, 1: weight}
                         ,callbacks =[model_callback]
                         #,steps_per_epoch=500
                         )
-    #Plotting accuracy and loss over epoch time
-    plt.plot(history.history['accuracy'], label = 'accuracy')
-    plt.plot(history.history['loss'], label = 'loss')
-    #plt.plot(history.history['val_accuracy'],label='validation accuracy')
-    #plt.plot(history.history['val_loss'], label = 'validation loss')
+
+
+    plt.figure(figsize=(12, 6))
+
+    plt.subplot(1, 2, 1)
+    plt.plot(history.history['accuracy'], label='Training Accuracy')
+    plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
+    plt.title('Accuracy')
+    plt.xlabel('Epoch')
+    plt.ylabel('Accuracy')
     plt.legend()
+
+    # Plot loss
+    plt.subplot(1, 2, 2)
+    plt.plot(history.history['loss'], label='Training Loss')
+    plt.plot(history.history['val_loss'], label='Validation Loss')
+    plt.title('Loss')
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.legend()
+
+    # Adjust layout to prevent overlapping
+    plt.tight_layout()
+
+    # Show the plots
     plt.show()
 
 

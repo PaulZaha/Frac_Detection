@@ -85,14 +85,14 @@ def preprocessing(df):
     #df = df[df['leg'] == 1]
     #inital main dataframe turned into dataset with columns 'image_id' and str('fractured')
     dataset = df[['image_id', 'fractured']].assign(fractured=df['fractured'].astype(str))
-    dataset = dataset.sample(frac = 1)
+    dataset = dataset.sample(frac = 0.25)
 
     #Datensatz aufgeteilt in 10% Testdaten und 90% Trainingsdaten
     train_dataset, test_dataset = train_test_split(dataset, train_size = 0.9, shuffle = True)
 
     #Gewicht, da non-fractured und fractured nicht gleich viele. Wird übergeben in model
     gewicht = round(((dataset['fractured'].value_counts()).get(0,1))/(dataset['fractured'].value_counts()).get(1,0),3)
-
+    print(gewicht)
     return train_dataset, test_dataset,gewicht
 
 
@@ -102,14 +102,14 @@ def create_generators(train_df,test_df,targetsize):
     Creates a training image dataset and a validation image dataset. Args[df: preprocessed dataframe]
     """
     #Pfad zu Bildern
-    path = os.path.join(os.getcwd(),'Dataset_FracAtlas','images','all')
+    path = os.path.join(os.getcwd(),'Dataset_FracAtlas','images','full_augmented_v2')
 
     datagen = tf.keras.preprocessing.image.ImageDataGenerator(rescale = 1./255
-                                                              ,horizontal_flip=True
-                                                              ,rotation_range=10 
+                                                              #,horizontal_flip=True
+                                                              ,rotation_range=20 
                                                               ,width_shift_range=0.05
                                                               ,height_shift_range=0.05
-                                                              ,zoom_range=0.1
+                                                              #,zoom_range=0.1
                                                               ,validation_split=0.2)
     
     test_datagen = tf.keras.preprocessing.image.ImageDataGenerator(rescale=1./255)
@@ -158,10 +158,10 @@ def main():
     train_dataset, test_dataset, gewicht = preprocessing(general_info_df)
 
     
-    targetsize = (224,224)
+    targetsize = (373,373)
     train_generator,validation_generator, test_generator = create_generators(train_dataset,test_dataset,targetsize)
 
-    InceptionV3(train_generator,validation_generator,test_generator,gewicht)
+    Xception(train_generator,validation_generator,test_generator,gewicht)
     #showimage('IMG0003726.jpg')
 
 if __name__ == "__main__":
