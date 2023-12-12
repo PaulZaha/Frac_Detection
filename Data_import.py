@@ -82,11 +82,14 @@ def preprocessing(df):
     """
     Creating csv with Columns ['image_id','fractured'] for dataset input pipeline. Args[df: main dataframe]
     """
+    print("Initialer Dataframe: ")
+    print(df)
     #df = df[df['leg'] == 1]
     #inital main dataframe turned into dataset with columns 'image_id' and str('fractured')
     dataset = df[['image_id', 'fractured']].assign(fractured=df['fractured'].astype(str))
-    dataset = dataset.sample(frac = 0.25)
-
+    dataset = dataset.sample(frac = 0.1)
+    print("angepasstes dataset: ")
+    print(dataset)
     #Datensatz aufgeteilt in 10% Testdaten und 90% Trainingsdaten
     train_dataset, test_dataset = train_test_split(dataset, train_size = 0.9, shuffle = True)
 
@@ -102,7 +105,7 @@ def create_generators(train_df,test_df,targetsize):
     Creates a training image dataset and a validation image dataset. Args[df: preprocessed dataframe]
     """
     #Pfad zu Bildern
-    path = os.path.join(os.getcwd(),'Dataset_FracAtlas','images','full_augmented_v2')
+    path = os.path.join(os.getcwd(),'Dataset_FracAtlas','images','edge_enhance_more')
 
     datagen = tf.keras.preprocessing.image.ImageDataGenerator(rescale = 1./255
                                                               #,horizontal_flip=True

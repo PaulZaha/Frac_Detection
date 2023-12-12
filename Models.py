@@ -86,7 +86,7 @@ def vgg19(train_generator,validation_generator,test_generator,weight):
 
 def densenet201(train_generator,validation_generator,test_generator,weight):
     
-    input_layer = layers.Input(shape=(224,224,3))
+    input_layer = layers.Input(shape=(373,373,3))
 
     model_densenet201 = DenseNet201(weights='imagenet',input_tensor = input_layer,include_top = False)
 
@@ -112,7 +112,7 @@ def densenet201(train_generator,validation_generator,test_generator,weight):
 
 def InceptionV3(train_generator,validation_generator,test_generator,weight):
     
-    input_layer = layers.Input(shape=(224,224,3))
+    input_layer = layers.Input(shape=(373,373,3))
 
     model_InceptionV3 = tf.keras.applications.InceptionV3(input_tensor = input_layer,include_top = False,weights='imagenet')
 
@@ -199,7 +199,7 @@ def model_compiler(model):
     
 
 def model_fitter(model,train_generator,validation_generator,weight):
-    history = model.fit(train_generator,validation_data=validation_generator,epochs=5
+    history = model.fit(train_generator,validation_data=validation_generator,epochs=3
                         ,class_weight = {0: 1, 1: weight}
                         ,callbacks =[model_callback]
                         #,steps_per_epoch=500
