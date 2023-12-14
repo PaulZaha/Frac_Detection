@@ -205,7 +205,7 @@ def model_compiler(model):
     
 
 def model_fitter(model,train_generator,validation_generator,weight):
-    history = model.fit(train_generator,validation_data=validation_generator,epochs=3
+    history = model.fit(train_generator,validation_data=validation_generator,epochs=1
                         ,class_weight = {0: 1, 1: weight}
                         ,callbacks =[model_callback,stopper]
                         #,steps_per_epoch=500
@@ -248,10 +248,25 @@ def model_evaluater(test_dataset):
     true_labels = np.array(test_dataset.classes)
     print("True labels: ")
     print(true_labels)
-    predicted_labels = (model.predict(test_dataset)[:, 0] > 0.5).astype(int)
-    predicted_labels_raw = model.predict(test_dataset)
-    print("Predicted Labels: ")
-    print(predicted_labels_raw)
+
+
+    #predicted_labels = (model.predict(test_dataset)[:, 0] > 0.5).astype(int)
+    #predicted_labels_raw = model.predict(test_dataset)
+
+    x_test, y_test = test_dataset.next()
+    predictions = model.predict(x_test, verbose=1)
+    print(predictions)
+    predicted_labels = (predictions > 0.5).astype('int32')
+    predicted_labels = np.concatenate(predicted_labels)
+    print(predicted_labels)
+
+
+    confusion_matrix(true_labels, predicted_labels)
+
+
+
+    #print("Predicted Labels: ")
+    #print(predicted_labels_raw)
     #Confusion Matrix
     conf_matrix = tf.math.confusion_matrix(true_labels,predicted_labels)
     conf_matrix = tf.reverse(conf_matrix, axis=[0])

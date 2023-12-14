@@ -87,7 +87,7 @@ def preprocessing(df):
     #df = df[df['leg'] == 1]
     #inital main dataframe turned into dataset with columns 'image_id' and str('fractured')
     dataset = df[['image_id', 'fractured']].assign(fractured=df['fractured'].astype(str))
-    dataset = dataset.sample(frac = 0.2)
+    dataset = dataset.sample(frac = 0.1)
     print("angepasstes dataset: ")
     print(dataset)
     #Datensatz aufgeteilt in 10% Testdaten und 90% Trainingsdaten
@@ -148,7 +148,7 @@ def create_generators(train_df,test_df,targetsize):
                                                         color_mode = 'rgb',
                                                         shuffle=True,
                                                         target_size=targetsize,
-                                                        batch_size=32)
+                                                        batch_size=122)
 
     
     return train_generator, validation_generator, test_generator
