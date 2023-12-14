@@ -87,12 +87,12 @@ def preprocessing(df):
     #df = df[df['leg'] == 1]
     #inital main dataframe turned into dataset with columns 'image_id' and str('fractured')
     dataset = df[['image_id', 'fractured']].assign(fractured=df['fractured'].astype(str))
-    dataset = dataset.sample(frac = 0.1)
+    dataset = dataset.sample(frac = 0.2)
     print("angepasstes dataset: ")
     print(dataset)
     #Datensatz aufgeteilt in 10% Testdaten und 90% Trainingsdaten
     train_dataset, test_dataset = train_test_split(dataset, train_size = 0.9, shuffle = True)
-
+    print(test_dataset)
     #Gewicht, da non-fractured und fractured nicht gleich viele. Wird übergeben in model
     gewicht = round(((dataset['fractured'].value_counts()).get(0,1))/(dataset['fractured'].value_counts()).get(1,0),3)
     print(gewicht)
@@ -127,7 +127,7 @@ def create_generators(train_df,test_df,targetsize):
                                                         shuffle=True,
                                                         target_size=targetsize,
                                                         subset='training'
-                                                        ,batch_size=16)
+                                                        ,batch_size=32)
     
     validation_generator = datagen.flow_from_dataframe(dataframe=train_df,
                                                         directory=path,
@@ -138,7 +138,7 @@ def create_generators(train_df,test_df,targetsize):
                                                         shuffle=True,
                                                         target_size=targetsize,
                                                         subset='validation'
-                                                        ,batch_size=16)
+                                                        ,batch_size=32)
 
     test_generator = test_datagen.flow_from_dataframe(dataframe=test_df,
                                                       directory=path,
@@ -148,7 +148,7 @@ def create_generators(train_df,test_df,targetsize):
                                                         color_mode = 'rgb',
                                                         shuffle=True,
                                                         target_size=targetsize,
-                                                        batch_size=16)
+                                                        batch_size=32)
 
     
     return train_generator, validation_generator, test_generator

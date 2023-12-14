@@ -24,6 +24,12 @@ model_callback = tf.keras.callbacks.ModelCheckpoint(
     save_best_only=True,
     verbose=1
 )
+stopper = tf.keras.callbacks.EarlyStopping(
+    monitor='val_loss'
+    ,mode='min'
+    ,verbose=1
+    ,patience=3
+)
 
 
 def vgg16(train_generator,validation_generator,test_generator,weight):
@@ -201,7 +207,7 @@ def model_compiler(model):
 def model_fitter(model,train_generator,validation_generator,weight):
     history = model.fit(train_generator,validation_data=validation_generator,epochs=3
                         ,class_weight = {0: 1, 1: weight}
-                        ,callbacks =[model_callback]
+                        ,callbacks =[model_callback,stopper]
                         #,steps_per_epoch=500
                         )
 
@@ -236,11 +242,16 @@ def model_fitter(model,train_generator,validation_generator,weight):
 def model_evaluater(test_dataset):
     model = tf.keras.models.load_model(os.path.join(os.getcwd(),"bestmodel.h5"))
 
-    #results = model.evaluate(test_dataset)
+    results = model.evaluate(test_dataset)
+    print("test loss, test acc: ", results)
 
     true_labels = np.array(test_dataset.classes)
+    print("True labels: ")
+    print(true_labels)
     predicted_labels = (model.predict(test_dataset)[:, 0] > 0.5).astype(int)
-
+    predicted_labels_raw = model.predict(test_dataset)
+    print("Predicted Labels: ")
+    print(predicted_labels_raw)
     #Confusion Matrix
     conf_matrix = tf.math.confusion_matrix(true_labels,predicted_labels)
     conf_matrix = tf.reverse(conf_matrix, axis=[0])
