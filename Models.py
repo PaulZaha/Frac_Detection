@@ -10,12 +10,15 @@ from tensorflow.keras.applications import InceptionV3
 from tensorflow.keras.applications import ResNet152V2
 from tensorflow.keras.applications import Xception
 
-from sklearn.metrics import confusion_matrix
-
 import matplotlib.pyplot as PLT
+
 
 from Data_import import *
 
+
+#Globally create Keras callbacks
+
+#Save weights and model from best epoch
 checkpoint_path = os.path.join(os.getcwd(),'bestmodel.h5')
 model_callback = tf.keras.callbacks.ModelCheckpoint(
     filepath = checkpoint_path,
@@ -24,6 +27,8 @@ model_callback = tf.keras.callbacks.ModelCheckpoint(
     save_best_only=True,
     verbose=1
 )
+
+#Create early stopper to prevent overfitting
 stopper = tf.keras.callbacks.EarlyStopping(
     monitor='val_loss'
     ,mode='min'
@@ -190,30 +195,33 @@ def Xception(train_generator,validation_generator,test_generator,weight):
     #Layer untrainable machen
     for layer in model.layers[:-1]: #auf -1 ändern, wenn nur der finale classifier und keine Dense schicht
         layer.trainable=False
-    model.summary()
+
     model_compiler(model)
+
     print("Ab hier: Model Fitting")
     model_fitter(model,train_generator,validation_generator,weight)
+
     print("Ab hier: Model evaluation")
     model_evaluater(test_generator)
 
 
 def model_compiler(model):
     model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-5),
-            loss=tf.keras.losses.BinaryCrossentropy(), #evtl binary_focal_crossentropy
-            metrics=['accuracy','FalseNegatives','FalsePositives','Precision'])
+            loss=tf.keras.losses.BinaryCrossentropy(),
+            metrics=['accuracy','FalseNegatives','FalsePositives','Precision','Recall'])
     
 
 def model_fitter(model,train_generator,validation_generator,weight):
-    history = model.fit(train_generator,validation_data=validation_generator,epochs=1
+    history = model.fit(train_generator,validation_data=validation_generator,epochs=20
                         ,class_weight = {0: 1, 1: weight}
                         ,callbacks =[model_callback,stopper]
                         #,steps_per_epoch=500
                         )
 
-
+    #Create plots
     plt.figure(figsize=(12, 6))
 
+    #Plot training and validation accuracy
     plt.subplot(1, 2, 1)
     plt.plot(history.history['accuracy'], label='Training Accuracy')
     plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
@@ -222,7 +230,7 @@ def model_fitter(model,train_generator,validation_generator,weight):
     plt.ylabel('Accuracy')
     plt.legend()
 
-    # Plot loss
+    #Plot training and validation loss
     plt.subplot(1, 2, 2)
     plt.plot(history.history['loss'], label='Training Loss')
     plt.plot(history.history['val_loss'], label='Validation Loss')
@@ -238,52 +246,48 @@ def model_fitter(model,train_generator,validation_generator,weight):
     plt.show()
 
 
-
-def model_evaluater(test_dataset):
+def model_evaluater(test_generator):
+    #Load model from best epoch
     model = tf.keras.models.load_model(os.path.join(os.getcwd(),"bestmodel.h5"))
 
-    results = model.evaluate(test_dataset)
-    print("test loss, test acc, False_negatives, False_positives, Precision: ", results)
+    #Evaluate the model and save to results
+    results = model.evaluate(test_generator)
 
-    true_labels = np.array(test_dataset.classes)
-    print("True labels: ")
-    print(true_labels)
-
-
-    #predicted_labels = (model.predict(test_dataset)[:, 0] > 0.5).astype(int)
-    #predicted_labels_raw = model.predict(test_dataset)
-
-    x_test, y_test = test_dataset.next()
-    predictions = model.predict(x_test, verbose=1)
-    print(predictions)
-    predicted_labels = (predictions > 0.5).astype('int32')
-    predicted_labels = np.concatenate(predicted_labels)
-    print(predicted_labels)
+    #Create dict with evaluation metrics for testing dataset
+    eval_metrics = {"Accuracy: ": results[1]
+                    ,"Loss: ": results[0]
+                    ,"False_Negatives: ":int(results[2])
+                    ,"False_Positives: ":int(results[3])
+                    ,"Precision: ":results[4]
+                    ,"Recall: ":results[5]
+                    }
+    print(eval_metrics)
 
 
-    confusion_matrix(true_labels, predicted_labels)
+    False_Negatives = int(eval_metrics['False_Negatives: '])
+    False_Positives = int(eval_metrics['False_Positives: '])
+
+    True_Positives = int((eval_metrics['Precision: ']*False_Positives)/(1-eval_metrics['Precision: ']))
+    True_Negatives = int((test_generator.n)-True_Positives-False_Negatives-False_Positives)
+
+    Precicion = eval_metrics['Precision: ']
+    Recall = eval_metrics['Recall: ']
+    Accuracy = eval_metrics['Accuracy: ']
 
 
+    confusion_matrix = np.array([[True_Positives,False_Positives],[False_Negatives,True_Negatives]])
 
-    #print("Predicted Labels: ")
-    #print(predicted_labels_raw)
-    #Confusion Matrix
-    conf_matrix = tf.math.confusion_matrix(true_labels,predicted_labels)
-    conf_matrix = tf.reverse(conf_matrix, axis=[0])
-    conf_matrix = tf.reverse(conf_matrix, axis=[1])
+    print('Confusion Matrix:')
+    print(confusion_matrix)
 
-    TP = conf_matrix[1, 1]
-    TN = conf_matrix[0, 0]
-    FP = conf_matrix[0, 1]
-    FN = conf_matrix[1, 0]
+    print('Accuracy:')
+    print(Accuracy)
 
+    print('Precicion:')
+    print(Precicion)
 
-    sensitivity = TP / (TP + FN)
-    specificity = TN / (TN + FP)
-    accuracy = (TP + TN) / (TP + TN + FP + FN)
+    print('Recall:')
+    print(Recall)
 
-    print("Confusion Matrix:")
-    print(conf_matrix)
-    print("Sensitivity (True Positive Rate):", sensitivity)
-    print("Specificity (True Negative Rate):", specificity)
-    print("Accuracy:", accuracy)
+    
+    

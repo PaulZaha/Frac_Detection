@@ -35,7 +35,6 @@ def showimage(name):
     #Navigiert path in Bilder Ordner
     os.chdir(os.path.join(os.getcwd(),'Dataset_FracAtlas','images','all'))
     
-
     #Plots erstellen, Laden  des Bildes
     fig,ax = plt.subplots()
     ax.imshow(mpimg.imread(name),cmap='gray')
@@ -52,6 +51,10 @@ def showimage(name):
     plt.show()
     
 def boundingbox(name,fig,ax):
+    """
+    Shows boundingbox in showimage() if the picture is a fracture.#
+    DANGER: Does not work for augmented fratures.
+    """
     #Pathing in xml Ordner
     path = os.path.join(os.getcwd(),'Dataset_FracAtlas','Annotations','PASCAL VOC')
     os.chdir(path)
@@ -80,33 +83,36 @@ def boundingbox(name,fig,ax):
 
 def preprocessing(df):
     """
-    Creating csv with Columns ['image_id','fractured'] for dataset input pipeline. Args[df: main dataframe]
+    Returns train_dataset and test_dataset Pandas dataframes as well as a weight factor for slightly unbalanced dataset.
     """
-    print("Initialer Dataframe: ")
-    print(df)
-    #df = df[df['leg'] == 1]
-    #inital main dataframe turned into dataset with columns 'image_id' and str('fractured')
+
+    #Inital main dataframe turned into dataset with columns 'image_id' and str('fractured')
     dataset = df[['image_id', 'fractured']].assign(fractured=df['fractured'].astype(str))
-    dataset = dataset.sample(frac = 0.1)
-    print("angepasstes dataset: ")
-    print(dataset)
+
+    #For testing purposes frac smaller
+    #!Delete before deployment
+    dataset = dataset.sample(frac = 1)
+
     #Datensatz aufgeteilt in 10% Testdaten und 90% Trainingsdaten
     train_dataset, test_dataset = train_test_split(dataset, train_size = 0.9, shuffle = True)
-    print(test_dataset)
+
     #Gewicht, da non-fractured und fractured nicht gleich viele. Wird übergeben in model
     gewicht = round(((dataset['fractured'].value_counts()).get(0,1))/(dataset['fractured'].value_counts()).get(1,0),3)
-    print(gewicht)
+
+
     return train_dataset, test_dataset,gewicht
 
 
 #Todo k-fold cross validation einbauen
 def create_generators(train_df,test_df,targetsize):
     """
-    Creates a training image dataset and a validation image dataset. Args[df: preprocessed dataframe]
+    Creates train_, validation_, and test_generator to feed Model with batches of data
     """
     #Pfad zu Bildern
+    #!Je nach preprocessing-technique abändern
     path = os.path.join(os.getcwd(),'Dataset_FracAtlas','images','edge_enhance_more')
 
+    #Create DataGenerator for training and validation data with augmentation
     datagen = tf.keras.preprocessing.image.ImageDataGenerator(rescale = 1./255
                                                               #,horizontal_flip=True
                                                               ,rotation_range=20 
@@ -115,6 +121,7 @@ def create_generators(train_df,test_df,targetsize):
                                                               #,zoom_range=0.1
                                                               ,validation_split=0.2)
     
+    #Create DataGenerator for testing without augmentation
     test_datagen = tf.keras.preprocessing.image.ImageDataGenerator(rescale=1./255)
 
 
@@ -129,6 +136,7 @@ def create_generators(train_df,test_df,targetsize):
                                                         subset='training'
                                                         ,batch_size=32)
     
+
     validation_generator = datagen.flow_from_dataframe(dataframe=train_df,
                                                         directory=path,
                                                         x_col='image_id',
@@ -148,7 +156,7 @@ def create_generators(train_df,test_df,targetsize):
                                                         color_mode = 'rgb',
                                                         shuffle=True,
                                                         target_size=targetsize,
-                                                        batch_size=122)
+                                                        batch_size=1)
 
     
     return train_generator, validation_generator, test_generator
@@ -158,14 +166,18 @@ def create_generators(train_df,test_df,targetsize):
     
 
 def main():
+    #Create train and test split with preprocessing function
     train_dataset, test_dataset, gewicht = preprocessing(general_info_df)
 
-    
+    #Set targetsize
     targetsize = (373,373)
+    
+    #Create generators from train/test-split with chosen targetsize
     train_generator,validation_generator, test_generator = create_generators(train_dataset,test_dataset,targetsize)
 
+    #Feed generators to model from models.py
     Xception(train_generator,validation_generator,test_generator,gewicht)
-    #showimage('IMG0003726.jpg')
+
 
 if __name__ == "__main__":
     main()
