@@ -201,7 +201,7 @@ def Xception(train_generator,validation_generator,test_generator,weight):
 def model_compiler(model):
     model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-5),
             loss=tf.keras.losses.BinaryCrossentropy(), #evtl binary_focal_crossentropy
-            metrics=['accuracy'])
+            metrics=['accuracy','FalseNegatives','FalsePositives','Precision'])
     
 
 def model_fitter(model,train_generator,validation_generator,weight):
@@ -243,7 +243,7 @@ def model_evaluater(test_dataset):
     model = tf.keras.models.load_model(os.path.join(os.getcwd(),"bestmodel.h5"))
 
     results = model.evaluate(test_dataset)
-    print("test loss, test acc: ", results)
+    print("test loss, test acc, False_negatives, False_positives, Precision: ", results)
 
     true_labels = np.array(test_dataset.classes)
     print("True labels: ")
