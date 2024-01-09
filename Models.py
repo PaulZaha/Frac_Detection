@@ -13,7 +13,7 @@ from tensorflow.keras.applications import Xception
 import matplotlib.pyplot as PLT
 
 
-from Data_import import *
+from pipelines import *
 
 
 #Globally create Keras callbacks
