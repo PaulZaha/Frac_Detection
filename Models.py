@@ -9,15 +9,18 @@ from tensorflow.keras.applications import DenseNet201
 from tensorflow.keras.applications import InceptionV3
 from tensorflow.keras.applications import ResNet152V2
 from tensorflow.keras.applications import Xception
-
+import tensorboard
 import matplotlib.pyplot as PLT
+from datetime import datetime
+
 
 
 from pipelines import *
 
 
 #Globally create Keras callbacks
-
+log_dir = "logs" + datetime.now().strftime("%Y%m%d-%H%M%S")
+tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
 #Save weights and model from best epoch
 checkpoint_path = os.path.join(os.getcwd(),'bestmodel.h5')
 model_callback = tf.keras.callbacks.ModelCheckpoint(
@@ -191,7 +194,7 @@ def Xception(train_generator,validation_generator,test_generator,weight):
         #dropout,
         classifier
     ])
-
+    #keras.utils.plot_model(model_Xception,to_file='Xception.png',show_shapes=True,show_layer_names=True)
     #Layer untrainable machen
     for layer in model.layers[:-1]: #auf -1 ändern, wenn nur der finale classifier und keine Dense schicht
         layer.trainable=False
@@ -212,9 +215,9 @@ def model_compiler(model):
     
 
 def model_fitter(model,train_generator,validation_generator,weight):
-    history = model.fit(train_generator,validation_data=validation_generator,epochs=20
+    history = model.fit(train_generator,validation_data=validation_generator,epochs=1
                         ,class_weight = {0: 1, 1: weight}
-                        ,callbacks =[model_callback,stopper]
+                        ,callbacks =[model_callback,stopper,tensorboard_callback]
                         #,steps_per_epoch=500
                         )
 
