@@ -110,7 +110,7 @@ def create_generators(train_df,test_df,targetsize):
     """
     #Pfad zu Bildern
     #!Je nach preprocessing-technique abändern
-    path = os.path.join(os.getcwd(),'Dataset_FracAtlas','images','edge_enhance_more')
+    path = os.path.join(os.getcwd(),'Dataset_FracAtlas','images','full_augmented')
 
     #Create DataGenerator for training and validation data with augmentation
     datagen = tf.keras.preprocessing.image.ImageDataGenerator(rescale = 1./255
