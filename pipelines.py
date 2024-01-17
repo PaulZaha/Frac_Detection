@@ -16,7 +16,7 @@ from Models import *
 from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 #endregion
-
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 #region reading initial main dataframe
 #Set working directory to the dataset folder
@@ -88,7 +88,7 @@ def data_split(dataframe):
 
     #turn 'fractured' column to type(str)
     dataframe = dataframe[['image_id', 'fractured']].assign(fractured=dataframe['fractured'].astype(str))
-
+    #dataframe = dataframe.sample(frac=0.1)
     #Datensatz aufgeteilt in 10% Testdaten und 90% Trainingsdaten
     train_dataset, test_dataset = train_test_split(dataframe, train_size = 0.9, shuffle = True)
 
@@ -104,17 +104,20 @@ def create_generators(train_df,test_df,targetsize):
     Creates train_, validation_, and test_generator to feed Model with batches of data
     """
     #images pathing
-    path = os.path.join(os.getcwd(),'Dataset_FracAtlas','images','full_augmented')
+    path = os.path.join(os.getcwd(),'Dataset_FracAtlas','images','edge_detection')
 
     #Create DataGenerator for training and validation data with augmentation
-    datagen = tf.keras.preprocessing.image.ImageDataGenerator(rescale = 1./255
-                                                              ,rotation_range=10 
+    #Note: For EfficientNet remove rescaling
+    datagen = tf.keras.preprocessing.image.ImageDataGenerator(#rescale = 1./255,
+                                                              rotation_range=10 
                                                               ,width_shift_range=0.05
                                                               ,height_shift_range=0.05
                                                               ,validation_split=0.2)
     
     #Create DataGenerator for testing without augmentation
-    test_datagen = tf.keras.preprocessing.image.ImageDataGenerator(rescale=1./255)
+    #Note: For EfficientNet remove rescaling
+    test_datagen = tf.keras.preprocessing.image.ImageDataGenerator(#rescale=1./255
+                                                                   )
 
 
     train_generator = datagen.flow_from_dataframe(dataframe=train_df,
@@ -157,15 +160,29 @@ def main():
     #Create train and test split
     train_dataset, test_dataset, gewicht = data_split(general_info_df)
 
+
     #Set targetsize
-    targetsize = (373,373)
+    targetsize = (380,380)
     
     #Create generators from train/test-split with chosen targetsize
     train_generator,validation_generator, test_generator = create_generators(train_dataset,test_dataset,targetsize)
 
     #Feed generators to model from models.py
-    Xception(train_generator,validation_generator,test_generator,gewicht)
+    
 
+    #print("Densenet201")
+    #densenet201(train_generator,validation_generator,test_generator,gewicht)
+    #print("InceptionV3")
+    #InceptionV3(train_generator,validation_generator,test_generator,gewicht)
+    #print("ResNet152V2")
+    #ResNet152V2(train_generator,validation_generator,test_generator,gewicht)
+    #print("Xception")
+    #Xception(train_generator,validation_generator,test_generator,gewicht)
+    #print("InceptionResNetV2")
+    #InceptionResNetV2(train_generator,validation_generator,test_generator,gewicht)
+    print("EfficientNetB4 380")
+    EfficientNetB4(train_generator,validation_generator,test_generator,gewicht)
+    #Efficientnet funktioniert nicht, wieso auch immer. Mal die Errors anschauen
 
 if __name__ == "__main__":
     main()

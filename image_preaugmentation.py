@@ -84,6 +84,8 @@ for datei in non_fracs_downsampled:
     zielpfad = os.path.join(all_images,datei)
     shutil.copy2(quellpfad,zielpfad)
 
+os.mkdir('C:/Users/paulz/Documents/ProgrammingDigitalProjects_v2/Dataset_FracAtlas/images/edge_detection')
+edge_detection='C:/Users/paulz/Documents/ProgrammingDigitalProjects_v2/Dataset_FracAtlas/images/edge_detection'
 #edge detection
 for filename in os.listdir(all_images):
     print(filename)
@@ -92,5 +94,5 @@ for filename in os.listdir(all_images):
 
     img = img.filter(EDGE_ENHANCE_MORE)
     
-    output_path = os.path.join(all_images,filename)
+    output_path = os.path.join(edge_detection,filename)
     img.save(output_path)

@@ -1,0 +1,93 @@
+Epoch 1: val_accuracy improved from -inf to 0.78391, saving model to /mnt/c/Users/paulz/Documents/ProgrammingDigitalProjects_v2/bestmodel.h5
+/home/paul_zaha/.local/lib/python3.10/site-packages/keras/src/engine/training.py:3103: UserWarning: You are saving your model as an HDF5 file via `model.save()`. This file format is considered legacy. We recommend using instead the native Keras format, e.g. `model.save('my_model.keras')`.
+  saving_api.save_model(
+130/130 [==============================] - 123s 858ms/step - loss: 0.5841 - accuracy: 0.6976 - false_negatives: 625.0000 - false_positives: 624.0000 - precision: 0.6975 - recall: 0.6972 - val_loss: 0.4594 - val_accuracy: 0.7839 - val_false_negatives: 104.0000 - val_false_positives: 119.0000 - val_precision: 0.7812 - val_recall: 0.8034
+Epoch 2/20
+130/130 [==============================] - ETA: 0s - loss: 0.4374 - accuracy: 0.8073 - false_negatives: 405.0000 - false_positives: 391.0000 - precision: 0.8093 - recall: 0.8038
+Epoch 2: val_accuracy improved from 0.78391 to 0.81395, saving model to /mnt/c/Users/paulz/Documents/ProgrammingDigitalProjects_v2/bestmodel.h5
+130/130 [==============================] - 115s 888ms/step - loss: 0.4374 - accuracy: 0.8073 - false_negatives: 405.0000 - false_positives: 391.0000 - precision: 0.8093 - recall: 0.8038 - val_loss: 0.4147 - val_accuracy: 0.8140 - val_false_negatives: 93.0000 - val_false_positives: 99.0000 - val_precision: 0.8150 - val_recall: 0.8242
+Epoch 3/20
+130/130 [==============================] - ETA: 0s - loss: 0.3818 - accuracy: 0.8332 - false_negatives: 340.0000 - false_positives: 349.0000 - precision: 0.8316 - recall: 0.8353
+Epoch 3: val_accuracy improved from 0.81395 to 0.81589, saving model to /mnt/c/Users/paulz/Documents/ProgrammingDigitalProjects_v2/bestmodel.h5
+130/130 [==============================] - 215s 2s/step - loss: 0.3818 - accuracy: 0.8332 - false_negatives: 340.0000 - false_positives: 349.0000 - precision: 0.8316 - recall: 0.8353 - val_loss: 0.4011 - val_accuracy: 0.8159 - val_false_negatives: 73.0000 - val_false_positives: 117.0000 - val_precision: 0.7958 - val_recall: 0.8620
+Epoch 4/20
+130/130 [==============================] - ETA: 0s - loss: 0.3464 - accuracy: 0.8513 - false_negatives: 299.0000 - false_positives: 315.0000 - precision: 0.8486 - recall: 0.8551
+Epoch 4: val_accuracy improved from 0.81589 to 0.82849, saving model to /mnt/c/Users/paulz/Documents/ProgrammingDigitalProjects_v2/bestmodel.h5
+130/130 [==============================] - 147s 1s/step - loss: 0.3464 - accuracy: 0.8513 - false_negatives: 299.0000 - false_positives: 315.0000 - precision: 0.8486 - recall: 0.8551 - val_loss: 0.3831 - val_accuracy: 0.8285 - val_false_negatives: 70.0000 - val_false_positives: 107.0000 - val_precision: 0.8110 - val_recall: 0.8677
+Epoch 5/20
+130/130 [==============================] - ETA: 0s - loss: 0.3127 - accuracy: 0.8734 - false_negatives: 267.0000 - false_positives: 256.0000 - precision: 0.8753 - recall: 0.8706
+Epoch 5: val_accuracy improved from 0.82849 to 0.83527, saving model to /mnt/c/Users/paulz/Documents/ProgrammingDigitalProjects_v2/bestmodel.h5
+130/130 [==============================] - 218s 2s/step - loss: 0.3127 - accuracy: 0.8734 - false_negatives: 267.0000 - false_positives: 256.0000 - precision: 0.8753 - recall: 0.8706 - val_loss: 0.3540 - val_accuracy: 0.8353 - val_false_negatives: 77.0000 - val_false_positives: 93.0000 - val_precision: 0.8294 - val_recall: 0.8544
+Epoch 6/20
+130/130 [==============================] - ETA: 0s - loss: 0.2913 - accuracy: 0.8893 - false_negatives: 220.0000 - false_positives: 237.0000 - precision: 0.8861 - recall: 0.8934
+Epoch 6: val_accuracy improved from 0.83527 to 0.84690, saving model to /mnt/c/Users/paulz/Documents/ProgrammingDigitalProjects_v2/bestmodel.h5
+130/130 [==============================] - 251s 2s/step - loss: 0.2913 - accuracy: 0.8893 - false_negatives: 220.0000 - false_positives: 237.0000 - precision: 0.8861 - recall: 0.8934 - val_loss: 0.3450 - val_accuracy: 0.8469 - val_false_negatives: 46.0000 - val_false_positives: 112.0000 - val_precision: 0.8118 - val_recall: 0.9130
+Epoch 7/20
+130/130 [==============================] - ETA: 0s - loss: 0.2701 - accuracy: 0.8969 - false_negatives: 215.0000 - false_positives: 211.0000 - precision: 0.8976 - recall: 0.8958
+Epoch 7: val_accuracy did not improve from 0.84690
+130/130 [==============================] - 119s 911ms/step - loss: 0.2701 - accuracy: 0.8969 - false_negatives: 215.0000 - false_positives: 211.0000 - precision: 0.8976 - recall: 0.8958 - val_loss: 0.3346 - val_accuracy: 0.8459 - val_false_negatives: 54.0000 - val_false_positives: 105.0000 - val_precision: 0.8190 - val_recall: 0.8979
+Epoch 8/20
+130/130 [==============================] - ETA: 0s - loss: 0.2616 - accuracy: 0.9010 - false_negatives: 190.0000 - false_positives: 219.0000 - precision: 0.8954 - recall: 0.9079
+Epoch 8: val_accuracy improved from 0.84690 to 0.86143, saving model to /mnt/c/Users/paulz/Documents/ProgrammingDigitalProjects_v2/bestmodel.h5
+130/130 [==============================] - 119s 916ms/step - loss: 0.2616 - accuracy: 0.9010 - false_negatives: 190.0000 - false_positives: 219.0000 - precision: 0.8954 - recall: 0.9079 - val_loss: 0.3291 - val_accuracy: 0.8614 - val_false_negatives: 97.0000 - val_false_positives: 46.0000 - val_precision: 0.9038 - val_recall: 0.8166
+Epoch 9/20
+130/130 [==============================] - ETA: 0s - loss: 0.2466 - accuracy: 0.9092 - false_negatives: 199.0000 - false_positives: 176.0000 - precision: 0.9138 - recall: 0.9036
+Epoch 9: val_accuracy improved from 0.86143 to 0.87597, saving model to /mnt/c/Users/paulz/Documents/ProgrammingDigitalProjects_v2/bestmodel.h5
+130/130 [==============================] - 123s 943ms/step - loss: 0.2466 - accuracy: 0.9092 - false_negatives: 199.0000 - false_positives: 176.0000 - precision: 0.9138 - recall: 0.9036 - val_loss: 0.3034 - val_accuracy: 0.8760 - val_false_negatives: 54.0000 - val_false_positives: 74.0000 - val_precision: 0.8652 - val_recall: 0.8979
+Epoch 10/20
+130/130 [==============================] - ETA: 0s - loss: 0.2283 - accuracy: 0.9174 - false_negatives: 171.0000 - false_positives: 170.0000 - precision: 0.9176 - recall: 0.9172
+Epoch 10: val_accuracy improved from 0.87597 to 0.88469, saving model to /mnt/c/Users/paulz/Documents/ProgrammingDigitalProjects_v2/bestmodel.h5
+130/130 [==============================] - 115s 886ms/step - loss: 0.2283 - accuracy: 0.9174 - false_negatives: 171.0000 - false_positives: 170.0000 - precision: 0.9176 - recall: 0.9172 - val_loss: 0.2915 - val_accuracy: 0.8847 - val_false_negatives: 51.0000 - val_false_positives: 68.0000 - val_precision: 0.8755 - val_recall: 0.9036
+Epoch 11/20
+130/130 [==============================] - ETA: 0s - loss: 0.2180 - accuracy: 0.9269 - false_negatives: 150.0000 - false_positives: 152.0000 - precision: 0.9264 - recall: 0.9273
+Epoch 11: val_accuracy did not improve from 0.88469
+130/130 [==============================] - 116s 893ms/step - loss: 0.2180 - accuracy: 0.9269 - false_negatives: 150.0000 - false_positives: 152.0000 - precision: 0.9264 - recall: 0.9273 - val_loss: 0.2928 - val_accuracy: 0.8789 - val_false_negatives: 57.0000 - val_false_positives: 68.0000 - val_precision: 0.8741 - val_recall: 0.8922
+Epoch 12/20
+130/130 [==============================] - ETA: 0s - loss: 0.2031 - accuracy: 0.9305 - false_negatives: 136.0000 - false_positives: 151.0000 - precision: 0.9274 - recall: 0.9341
+Epoch 12: val_accuracy did not improve from 0.88469
+130/130 [==============================] - 116s 888ms/step - loss: 0.2031 - accuracy: 0.9305 - false_negatives: 136.0000 - false_positives: 151.0000 - precision: 0.9274 - recall: 0.9341 - val_loss: 0.2814 - val_accuracy: 0.8789 - val_false_negatives: 61.0000 - val_false_positives: 64.0000 - val_precision: 0.8797 - val_recall: 0.8847
+Epoch 13/20
+130/130 [==============================] - ETA: 0s - loss: 0.2034 - accuracy: 0.9317 - false_negatives: 134.0000 - false_positives: 148.0000 - precision: 0.9288 - recall: 0.9351
+Epoch 13: val_accuracy improved from 0.88469 to 0.89729, saving model to /mnt/c/Users/paulz/Documents/ProgrammingDigitalProjects_v2/bestmodel.h5
+130/130 [==============================] - 120s 913ms/step - loss: 0.2034 - accuracy: 0.9317 - false_negatives: 134.0000 - false_positives: 148.0000 - precision: 0.9288 - recall: 0.9351 - val_loss: 0.2778 - val_accuracy: 0.8973 - val_false_negatives: 52.0000 - val_false_positives: 54.0000 - val_precision: 0.8983 - val_recall: 0.9017
+Epoch 14/20
+130/130 [==============================] - ETA: 0s - loss: 0.1880 - accuracy: 0.9361 - false_negatives: 126.0000 - false_positives: 138.0000 - precision: 0.9335 - recall: 0.9390
+
+Epoch 14: val_accuracy did not improve from 0.89729
+130/130 [==============================] - 116s 890ms/step - loss: 0.1880 - accuracy: 0.9361 - false_negatives: 126.0000 - false_positives: 138.0000 - precision: 0.9335 - recall: 0.9390 - val_loss: 0.2712 - val_accuracy: 0.8808 - val_false_negatives: 38.0000 - val_false_positives: 85.0000 - val_precision: 0.8524 - val_recall: 0.9282
+Epoch 15/20
+130/130 [==============================] - ETA: 0s - loss: 0.1827 - accuracy: 0.9400 - false_negatives: 120.0000 - false_positives: 128.0000 - precision: 0.9382 - recall: 0.9419
+Epoch 15: val_accuracy did not improve from 0.89729
+130/130 [==============================] - 116s 888ms/step - loss: 0.1827 - accuracy: 0.9400 - false_negatives: 120.0000 - false_positives: 128.0000 - precision: 0.9382 - recall: 0.9419 - val_loss: 0.2620 - val_accuracy: 0.8818 - val_false_negatives: 63.0000 - val_false_positives: 59.0000 - val_precision: 0.8876 - val_recall: 0.8809
+Epoch 16/20
+130/130 [==============================] - ETA: 0s - loss: 0.1734 - accuracy: 0.9470 - false_negatives: 113.0000 - false_positives: 106.0000 - precision: 0.9485 - recall: 0.9453
+Epoch 16: val_accuracy did not improve from 0.89729
+130/130 [==============================] - 115s 882ms/step - loss: 0.1734 - accuracy: 0.9470 - false_negatives: 113.0000 - false_positives: 106.0000 - precision: 0.9485 - recall: 0.9453 - val_loss: 0.2737 - val_accuracy: 0.8944 - val_false_negatives: 47.0000 - val_false_positives: 62.0000 - val_precision: 0.8860 - val_recall: 0.9112
+Epoch 17/20
+130/130 [==============================] - ETA: 0s - loss: 0.1749 - accuracy: 0.9419 - false_negatives: 124.0000 - false_positives: 116.0000 - precision: 0.9436 - recall: 0.9399
+Epoch 17: val_accuracy improved from 0.89729 to 0.90019, saving model to /mnt/c/Users/paulz/Documents/ProgrammingDigitalProjects_v2/bestmodel.h5
+130/130 [==============================] - 116s 889ms/step - loss: 0.1749 - accuracy: 0.9419 - false_negatives: 124.0000 - false_positives: 116.0000 - precision: 0.9436 - recall: 0.9399 - val_loss: 0.2634 - val_accuracy: 0.9002 - val_false_negatives: 28.0000 - val_false_positives: 75.0000 - val_precision: 0.8698 - val_recall: 0.9471
+Epoch 18/20
+130/130 [==============================] - ETA: 0s - loss: 0.1627 - accuracy: 0.9487 - false_negatives: 109.0000 - false_positives: 103.0000 - precision: 0.9500 - recall: 0.9472
+Epoch 18: val_accuracy did not improve from 0.90019
+130/130 [==============================] - 115s 883ms/step - loss: 0.1627 - accuracy: 0.9487 - false_negatives: 109.0000 - false_positives: 103.0000 - precision: 0.9500 - recall: 0.9472 - val_loss: 0.2552 - val_accuracy: 0.8924 - val_false_negatives: 39.0000 - val_false_positives: 72.0000 - val_precision: 0.8719 - val_recall: 0.9263
+Epoch 19/20
+130/130 [==============================] - ETA: 0s - loss: 0.1600 - accuracy: 0.9508 - false_negatives: 107.0000 - false_positives: 96.0000 - precision: 0.9532 - recall: 0.9482
+Epoch 19: val_accuracy did not improve from 0.90019
+130/130 [==============================] - 113s 867ms/step - loss: 0.1600 - accuracy: 0.9508 - false_negatives: 107.0000 - false_positives: 96.0000 - precision: 0.9532 - recall: 0.9482 - val_loss: 0.2567 - val_accuracy: 0.8905 - val_false_negatives: 41.0000 - val_false_positives: 72.0000 - val_precision: 0.8714 - val_recall: 0.9225
+Epoch 20/20
+130/130 [==============================] - ETA: 0s - loss: 0.1489 - accuracy: 0.9540 - false_negatives: 99.0000 - false_positives: 91.0000 - precision: 0.9557 - recall: 0.9520
+Epoch 20: val_accuracy improved from 0.90019 to 0.90504, saving model to /mnt/c/Users/paulz/Documents/ProgrammingDigitalProjects_v2/bestmodel.h5
+130/130 [==============================] - 115s 882ms/step - loss: 0.1489 - accuracy: 0.9540 - false_negatives: 99.0000 - false_positives: 91.0000 - precision: 0.9557 - recall: 0.9520 - val_loss: 0.2573 - val_accuracy: 0.9050 - val_false_negatives: 33.0000 - val_false_positives: 65.0000 - val_precision: 0.8841 - val_recall: 0.9376
+Ab hier: Model evaluation
+574/574 [==============================] - 12s 17ms/step - loss: 0.2473 - accuracy: 0.9007 - false_negatives: 31.0000 - false_positives: 26.0000 - precision: 0.9037 - recall: 0.8873
+{'Accuracy: ': 0.900696873664856, 'Loss: ': 0.24726660549640656, 'False_Negatives: ': 31, 'False_Positives: ': 26, 'Precision: ': 0.9037036895751953, 'Recall: ': 0.8872727155685425}
+Confusion Matrix:
+[[243  26]
+ [ 31 274]]
+Accuracy:
+0.900696873664856
+Precicion:
+0.9037036895751953
+Recall:
+0.8872727155685425

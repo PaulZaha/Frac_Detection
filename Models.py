@@ -18,10 +18,12 @@ from datetime import datetime
 from pipelines import *
 
 
-#Globally create Keras callbacks
+#TensorBoard Callback
 log_dir = "logs" + datetime.now().strftime("%Y%m%d-%H%M%S")
 tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
-#Save weights and model from best epoch
+
+
+#Callback, to save weights and model from best epoch
 checkpoint_path = os.path.join(os.getcwd(),'bestmodel.h5')
 model_callback = tf.keras.callbacks.ModelCheckpoint(
     filepath = checkpoint_path,
@@ -31,13 +33,67 @@ model_callback = tf.keras.callbacks.ModelCheckpoint(
     verbose=1
 )
 
-#Create early stopper to prevent overfitting
+#Callback: Create early stopper to prevent overfitting
 stopper = tf.keras.callbacks.EarlyStopping(
     monitor='val_loss'
     ,mode='min'
     ,verbose=1
     ,patience=3
 )
+
+adapted_lr = 2e-5
+#Todo hier die decay-function schreiben
+#Learning rate decay function used by Callback
+def learningrate_decay(epoch,lr):
+    print(global_train_loss)
+    
+    if epoch < 8:
+        print(lr)
+        return lr
+    else:
+        avg_train_loss = (global_train_loss[epoch-3]+global_train_loss[epoch-2]+global_train_loss[epoch-1])/3
+        avg_val_loss = (global_val_loss[epoch-3]+global_val_loss[epoch-2]+global_val_loss[epoch-1])/3
+        avg_residual_loss = avg_train_loss-avg_val_loss
+        global adapted_lr
+        print("Avg resid loss")
+        print(avg_residual_loss)
+        if avg_residual_loss < 0:
+            print("Decay")
+            adapted_lr = adapted_lr*(1-((-1)*avg_residual_loss))
+        print("Adapted_lr")
+        print(adapted_lr)
+        return adapted_lr
+        #global_loss ist der training loss, noch nicht der validation loss
+        #print("global loss in epoche " + str(epoch))
+        #print(global_loss)
+    print("Outer Loss")
+    print(global_train_loss)
+    print(global_val_loss)
+
+    
+
+#Initialize LearningRateScheduler Callback
+learning_rate_scheduler = tf.keras.callbacks.LearningRateScheduler(learningrate_decay)
+
+#Global lists with loss values for decay function
+global_train_loss = []
+global_val_loss = []
+
+#Callback to track training and validation loss
+class CustomCallback(tf.keras.callbacks.Callback):
+    def on_epoch_end(self,epoch,logs=None):
+        
+        
+        train_loss = logs.get('loss')
+        global_train_loss.append(train_loss)
+
+        val_loss = logs.get('val_loss')
+        global_val_loss.append(val_loss)
+        #print("global loss in epoche " + str(epoch))
+        #print(global_loss)
+
+#Initialising loss Callback
+custom_lr_update_callback = CustomCallback()
 
 
 def vgg16(train_generator,validation_generator,test_generator,weight):
@@ -102,7 +158,7 @@ def densenet201(train_generator,validation_generator,test_generator,weight):
     
     input_layer = layers.Input(shape=(373,373,3))
 
-    model_densenet201 = DenseNet201(weights='imagenet',input_tensor = input_layer,include_top = False)
+    model_densenet201 = tf.keras.applications.DenseNet201(weights='imagenet',input_tensor = input_layer,include_top = False)
 
     flatten = tf.keras.layers.Flatten()
     classifier = tf.keras.layers.Dense(1,activation='sigmoid')
@@ -151,7 +207,7 @@ def InceptionV3(train_generator,validation_generator,test_generator,weight):
 
 def ResNet152V2(train_generator,validation_generator,test_generator,weight):
     
-    input_layer = layers.Input(shape=(224,224,3))
+    input_layer = layers.Input(shape=(373,373,3))
 
     model_ResNet152V2 = tf.keras.applications.ResNet152V2(weights='imagenet',input_tensor = input_layer,include_top = False)
 
@@ -194,7 +250,7 @@ def Xception(train_generator,validation_generator,test_generator,weight):
         #dropout,
         classifier
     ])
-    #keras.utils.plot_model(model_Xception,to_file='Xception.png',show_shapes=True,show_layer_names=True)
+    #keras.utils.plot_model(model_Xception,to_file='Xception.png',show_shapes=True,show_layer_names=False)
     #Layer untrainable machen
     for layer in model.layers[:-1]: #auf -1 ändern, wenn nur der finale classifier und keine Dense schicht
         layer.trainable=False
@@ -207,19 +263,104 @@ def Xception(train_generator,validation_generator,test_generator,weight):
     print("Ab hier: Model evaluation")
     model_evaluater(test_generator)
 
+def InceptionResNetV2(train_generator,validation_generator,test_generator,weight):
+    
+    input_layer = layers.Input(shape=(373,373,3))
 
+    model_InceptionResNetV2 = tf.keras.applications.InceptionResNetV2(weights='imagenet',input_tensor = input_layer,include_top = False)
+
+    flatten = tf.keras.layers.Flatten()
+    classifier = tf.keras.layers.Dense(1,activation='sigmoid')
+    globalaverage = tf.keras.layers.GlobalAveragePooling2D()
+    dense1 = tf.keras.layers.Dense(128,activation='relu')
+    dropout = tf.keras.layers.Dropout(0.5)
+
+    model = tf.keras.models.Sequential([
+        model_InceptionResNetV2,
+        flatten,
+        #globalaverage,
+        #dense1,
+        #dropout,
+        classifier
+    ])
+
+    #Layer untrainable machen
+    for layer in model.layers[:-1]: #auf -1 ändern, wenn nur der finale classifier und keine Dense schicht
+        layer.trainable=False
+
+    model_compiler(model)
+
+    print("Ab hier: Model Fitting")
+    model_fitter(model,train_generator,validation_generator,weight)
+
+    print("Ab hier: Model evaluation")
+    model_evaluater(test_generator)
+
+#Note: For EfficientNet, remove rescaling in generator and set targetsize to 300 300
+def EfficientNetB4(train_generator,validation_generator,test_generator,weight):
+    
+    input_layer = layers.Input(shape=(380,380,3))
+
+    model_EfficientNetB4 = tf.keras.applications.EfficientNetB4(weights='imagenet',input_tensor = input_layer,include_top = False)
+
+    flatten = tf.keras.layers.Flatten()
+    classifier = tf.keras.layers.Dense(1,activation='sigmoid')
+    globalaverage = tf.keras.layers.GlobalAveragePooling2D()
+    dense1 = tf.keras.layers.Dense(128,activation='relu')
+    dropout = tf.keras.layers.Dropout(0.5)
+
+    model = tf.keras.models.Sequential([
+        model_EfficientNetB4,
+        flatten,
+        #globalaverage,
+        #dense1,
+        #dropout,
+        classifier
+    ])
+    #Layer untrainable machen
+    for layer in model.layers[:-1]: #auf -1 ändern, wenn nur der finale classifier und keine Dense schicht
+        layer.trainable=False
+
+    #keras.utils.plot_model(model_EfficientNetB4,to_file='EfficientNetB4.png',show_shapes=True,show_layer_names=True)
+    model_compiler_old(model)
+
+    print("Ab hier: Classifier Fitting")
+    model_fitter(model,train_generator,validation_generator,weight,20)
+
+  
+
+    print("Ab hier: Model evaluation")
+    model_evaluater(test_generator)
+
+#Benchmarking has been done with model_compiler_old
+def model_compiler_old(model):
+    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=2e-5),
+            loss=tf.keras.losses.BinaryCrossentropy(),
+            metrics=['accuracy','FalseNegatives','FalsePositives','Precision','Recall'])
+
+#optimized learning rate for hypertuning EfficientNetB4
 def model_compiler(model):
+    initial_lr = 1e-4
+    lr_schedule = keras.optimizers.schedules.ExponentialDecay(
+        initial_lr,
+        decay_steps=130,
+        decay_rate=0.94,
+        staircase=True
+    )
+    print("scheduler jetzt da")
     model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-5),
             loss=tf.keras.losses.BinaryCrossentropy(),
             metrics=['accuracy','FalseNegatives','FalsePositives','Precision','Recall'])
-    
 
-def model_fitter(model,train_generator,validation_generator,weight):
-    history = model.fit(train_generator,validation_data=validation_generator,epochs=1
+
+
+def model_fitter(model,train_generator,validation_generator,weight,epochs):
+    history = model.fit(train_generator,validation_data=validation_generator,epochs=epochs
                         ,class_weight = {0: 1, 1: weight}
-                        ,callbacks =[model_callback,stopper,tensorboard_callback]
+                        ,callbacks =[model_callback,stopper,tensorboard_callback,learning_rate_scheduler,custom_lr_update_callback]
                         #,steps_per_epoch=500
                         )
+#Todo den loss der class an die learningrate decay übergeben
 
     #Create plots
     plt.figure(figsize=(12, 6))
@@ -247,7 +388,6 @@ def model_fitter(model,train_generator,validation_generator,weight):
 
     # Show the plots
     plt.show()
-
 
 def model_evaluater(test_generator):
     #Load model from best epoch
