@@ -223,7 +223,8 @@ def ResNet152V2(train_generator,validation_generator,test_generator,weight):
     #Layer untrainable machen
     for layer in model.layers[:-1]: #auf -1 ändern, wenn nur der finale classifier und keine Dense schicht
         layer.trainable=False
-
+    model_ResNet152V2.summary()
+    model.summary()
     model_compiler(model)
     print("Ab hier: Model Fitting")
     model_fitter(model,train_generator,validation_generator,weight)

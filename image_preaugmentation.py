@@ -38,9 +38,9 @@ for filename in os.listdir(frac):
     rechts = links + neue_breite
     unten = oben + neue_höhe
 
-
+    img_resized = img.crop((links,oben,rechts,unten)).resize((neue_breite,neue_höhe),Image.ANTIALIAS)
     output_path = os.path.join(frac_augmented,filename)
-    img.save(output_path)
+    img_resized.save(output_path)
 
 # #alle bilder horizontal spiegeln
 for filename in os.listdir(frac_augmented):
@@ -53,7 +53,7 @@ for filename in os.listdir(frac_augmented):
 
 
     output_path = os.path.join(frac_augmented,filename)
-    img.save(output_path)
+    flipped_img.save(output_path)
 
 
 #downsampling der non_fractures
