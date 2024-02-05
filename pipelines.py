@@ -160,7 +160,7 @@ def main():
     #Create train and test split
     train_dataset, test_dataset, gewicht = data_split(general_info_df)
 
-    showimage('IMG0000847.jpg')
+    showimage('IMG0000143.jpg')
     #Set targetsize
     targetsize = (380,380)
     
