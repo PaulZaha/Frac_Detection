@@ -160,12 +160,13 @@ def main():
     #Create train and test split
     train_dataset, test_dataset, gewicht = data_split(general_info_df)
 
-    showimage('IMG0000143.jpg')
+    #showimage('IMG0000143.jpg')
+    
     #Set targetsize
     targetsize = (380,380)
     
     #Create generators from train/test-split with chosen targetsize
-    #train_generator,validation_generator, test_generator = create_generators(train_dataset,test_dataset,targetsize)
+    train_generator,validation_generator, test_generator = create_generators(train_dataset,test_dataset,targetsize)
 
     #Feed generators to model from models.py
     
@@ -181,8 +182,8 @@ def main():
     #print("InceptionResNetV2")
     #InceptionResNetV2(train_generator,validation_generator,test_generator,gewicht)
     #print("EfficientNetB4 380")
-    #EfficientNetB4(train_generator,validation_generator,test_generator,gewicht)
-    #Efficientnet funktioniert nicht, wieso auch immer. Mal die Errors anschauen
+    EfficientNetB4(train_generator,validation_generator,test_generator,gewicht)
+
 
 if __name__ == "__main__":
     main()

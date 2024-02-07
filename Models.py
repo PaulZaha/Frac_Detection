@@ -63,9 +63,6 @@ def learningrate_decay(epoch,lr):
         print("Adapted_lr")
         print(adapted_lr)
         return adapted_lr
-        #global_loss ist der training loss, noch nicht der validation loss
-        #print("global loss in epoche " + str(epoch))
-        #print(global_loss)
     print("Outer Loss")
     print(global_train_loss)
     print(global_val_loss)
@@ -89,8 +86,7 @@ class CustomCallback(tf.keras.callbacks.Callback):
 
         val_loss = logs.get('val_loss')
         global_val_loss.append(val_loss)
-        #print("global loss in epoche " + str(epoch))
-        #print(global_loss)
+
 
 #Initialising loss Callback
 custom_lr_update_callback = CustomCallback()
@@ -133,14 +129,12 @@ def vgg19(train_generator,validation_generator,test_generator,weight):
 
     #Flatten und Classifier hinzufügen
     flatten=tf.keras.layers.Flatten()
-    dense1=tf.keras.layers.Dense(512,activation='relu')
     classifier = tf.keras.layers.Dense(1,activation='sigmoid')
 
     #Model zusammenfügen
     model = tf.keras.models.Sequential([
         model_vgg19,
         flatten,
-        #dense1,
         classifier
     ])
 
@@ -223,8 +217,7 @@ def ResNet152V2(train_generator,validation_generator,test_generator,weight):
     #Layer untrainable machen
     for layer in model.layers[:-1]: #auf -1 ändern, wenn nur der finale classifier und keine Dense schicht
         layer.trainable=False
-    model_ResNet152V2.summary()
-    model.summary()
+
     model_compiler(model)
     print("Ab hier: Model Fitting")
     model_fitter(model,train_generator,validation_generator,weight)
@@ -239,16 +232,11 @@ def Xception(train_generator,validation_generator,test_generator,weight):
 
     flatten = tf.keras.layers.Flatten()
     classifier = tf.keras.layers.Dense(1,activation='sigmoid')
-    globalaverage = tf.keras.layers.GlobalAveragePooling2D()
-    dense1 = tf.keras.layers.Dense(128,activation='relu')
-    dropout = tf.keras.layers.Dropout(0.5)
+
 
     model = tf.keras.models.Sequential([
         model_Xception,
         flatten,
-        #globalaverage,
-        #dense1,
-        #dropout,
         classifier
     ])
     #keras.utils.plot_model(model_Xception,to_file='Xception.png',show_shapes=True,show_layer_names=False)
@@ -272,16 +260,10 @@ def InceptionResNetV2(train_generator,validation_generator,test_generator,weight
 
     flatten = tf.keras.layers.Flatten()
     classifier = tf.keras.layers.Dense(1,activation='sigmoid')
-    globalaverage = tf.keras.layers.GlobalAveragePooling2D()
-    dense1 = tf.keras.layers.Dense(128,activation='relu')
-    dropout = tf.keras.layers.Dropout(0.5)
 
     model = tf.keras.models.Sequential([
         model_InceptionResNetV2,
         flatten,
-        #globalaverage,
-        #dense1,
-        #dropout,
         classifier
     ])
 
@@ -306,16 +288,10 @@ def EfficientNetB4(train_generator,validation_generator,test_generator,weight):
 
     flatten = tf.keras.layers.Flatten()
     classifier = tf.keras.layers.Dense(1,activation='sigmoid')
-    globalaverage = tf.keras.layers.GlobalAveragePooling2D()
-    dense1 = tf.keras.layers.Dense(128,activation='relu')
-    dropout = tf.keras.layers.Dropout(0.5)
 
     model = tf.keras.models.Sequential([
         model_EfficientNetB4,
         flatten,
-        #globalaverage,
-        #dense1,
-        #dropout,
         classifier
     ])
     #Layer untrainable machen
