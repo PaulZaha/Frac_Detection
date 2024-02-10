@@ -88,7 +88,7 @@ def data_split(dataframe):
 
     #turn 'fractured' column to type(str)
     dataframe = dataframe[['image_id', 'fractured']].assign(fractured=dataframe['fractured'].astype(str))
-    #dataframe = dataframe.sample(frac=0.1)
+
     #Datensatz aufgeteilt in 10% Testdaten und 90% Trainingsdaten
     train_dataset, test_dataset = train_test_split(dataframe, train_size = 0.9, shuffle = True)
 

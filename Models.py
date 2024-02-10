@@ -337,7 +337,6 @@ def model_fitter(model,train_generator,validation_generator,weight,epochs):
                         ,callbacks =[model_callback,stopper,tensorboard_callback,learning_rate_scheduler,custom_lr_update_callback]
                         #,steps_per_epoch=500
                         )
-#Todo den loss der class an die learningrate decay übergeben
 
     #Create plots
     plt.figure(figsize=(12, 6))
